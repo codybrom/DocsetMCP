@@ -1,0 +1,15 @@
+name: Qt 6
+description: Cross-platform application framework
+docset_path: Qt_6/Qt.docset
+languages:
+  - qt
+types:
+  - Function
+  - Property
+  - cl
+  - Method
+  - Type
+  - Variable
+  - Macro
+  - Module
+  - Namespace

@@ -1,0 +1,12 @@
+name: Dojo
+description: Dojo Toolkit - modular JavaScript library
+docset_path: Dojo/Dojo.docset
+languages:
+  - dojo
+types:
+  - Method
+  - Property
+  - Event
+  - Constructor
+  - Object
+  - Function

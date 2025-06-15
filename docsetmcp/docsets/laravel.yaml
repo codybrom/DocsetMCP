@@ -1,0 +1,16 @@
+name: Laravel
+description: PHP web application framework
+docset_path: Laravel/Laravel.docset
+languages:
+  - laravel
+types:
+  - Method
+  - Property
+  - Section
+  - Class
+  - Namespace
+  - Trait
+  - Interface
+  - Helper
+  - Guide
+  - Constant

@@ -1,0 +1,10 @@
+name: Chai
+description: BDD / TDD assertion library for Node.js and browsers
+docset_path: Chai/Chai.docset
+languages:
+  - javascript
+  - typescript
+types:
+  - Method
+  - Guide
+  - Style

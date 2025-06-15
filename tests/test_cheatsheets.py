@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test suite for dashmcp cheatsheet functionality
+Test suite for docsetmcp cheatsheet functionality
 """
 
 import os
@@ -12,20 +12,22 @@ from unittest.mock import Mock, patch, MagicMock
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dashmcp.server import (
+from docsetmcp.server import (
     CheatsheetExtractor,
     search_cheatsheet,
     list_available_cheatsheets,
-    cheatsheet_extractors,
 )
+import docsetmcp.server
 
 
 class TestCheatsheetExtractor:
     """Test CheatsheetExtractor class"""
 
-    @patch("dashmcp.server.Path")
+    @patch("docsetmcp.server.Path")
     @patch("os.path.expanduser")
-    def test_init_success(self, mock_expanduser, mock_path_class):
+    def test_init_success(
+        self, mock_expanduser: MagicMock, mock_path_class: MagicMock
+    ) -> None:
         """Test successful initialization"""
         mock_expanduser.return_value = "/mock/path"
 
@@ -56,7 +58,7 @@ class TestCheatsheetExtractor:
             mock_expanduser.return_value = "/test/path"
 
             # Mock the Path class at module level
-            with patch("dashmcp.server.Path") as mock_path_class:
+            with patch("docsetmcp.server.Path") as mock_path_class:
                 # Create mock paths
                 mock_base_path = MagicMock()
                 mock_path_class.return_value = mock_base_path
@@ -83,32 +85,36 @@ class TestCheatsheetExtractor:
                 mock_base_path.__truediv__.return_value = test_path
 
                 # Need to patch CheatsheetExtractor's __init__ to test just _find_cheatsheet_dir
+                def mock_init(self: CheatsheetExtractor, name: str) -> None:
+                    setattr(self, "cheatsheets_path", mock_base_path)
+
                 with patch.object(
                     CheatsheetExtractor,
                     "__init__",
-                    lambda self, name: setattr(
-                        self, "cheatsheets_path", mock_base_path
-                    ),
+                    mock_init,
                 ):
                     extractor = CheatsheetExtractor("dummy")
 
                     # Test direct match
-                    result = extractor._find_cheatsheet_dir("Git")
+                    find_method = getattr(extractor, "_find_cheatsheet_dir")
+                    result = find_method("Git")
                     assert result == test_path
 
                     # Test case insensitive - need exists to return False for direct path
                     test_path.exists.return_value = False
-                    result = extractor._find_cheatsheet_dir("git")
+                    result = find_method("git")
                     assert result == git_dir
 
                     # Test fuzzy match
-                    result = extractor._find_cheatsheet_dir("bash")
+                    result = find_method("bash")
                     assert result == bash_test_dir
 
     @patch("sqlite3.connect")
     @patch("builtins.open", create=True)
     @patch("pathlib.Path.exists")
-    def test_search_categories(self, mock_exists, mock_open, mock_connect):
+    def test_search_categories(
+        self, mock_exists: MagicMock, mock_open: MagicMock, mock_connect: MagicMock
+    ) -> None:
         """Test searching for categories"""
         # Mock database results
         mock_cursor = MagicMock()
@@ -136,7 +142,10 @@ class TestCheatsheetExtractor:
         """
 
         # Create extractor with mocked initialization
-        with patch.object(CheatsheetExtractor, "__init__", lambda self, name: None):
+        def mock_init(self: CheatsheetExtractor, name: str) -> None:
+            pass
+
+        with patch.object(CheatsheetExtractor, "__init__", mock_init):
             extractor = CheatsheetExtractor("git")
             extractor.name = "Git"
             extractor.db_path = Path("/mock/path/db")
@@ -150,7 +159,9 @@ class TestCheatsheetExtractor:
 
     @patch("builtins.open", create=True)
     @patch("pathlib.Path.exists")
-    def test_extract_entry_content(self, mock_exists, mock_open):
+    def test_extract_entry_content(
+        self, mock_exists: MagicMock, mock_open: MagicMock
+    ) -> None:
         """Test extracting content from HTML"""
         mock_exists.return_value = True
 
@@ -163,23 +174,29 @@ class TestCheatsheetExtractor:
 
         mock_open.return_value.__enter__.return_value.read.return_value = html_content
 
-        with patch.object(CheatsheetExtractor, "__init__", lambda self, name: None):
+        def mock_init2(self: CheatsheetExtractor, name: str) -> None:
+            pass
+
+        with patch.object(CheatsheetExtractor, "__init__", mock_init2):
             extractor = CheatsheetExtractor("git")
             extractor.documents_path = Path("/mock/docs")
 
-            result = extractor._extract_entry_content("index.html", "Create branch")
+            extract_method = getattr(extractor, "_extract_entry_content")
+            result = extract_method("index.html", "Create branch")
             assert result == "```\ngit checkout -b new-branch\n```"
 
 
 class TestCheatsheetMCPTools:
     """Test MCP tool functions"""
 
-    def test_search_cheatsheet_success(self):
+    def test_search_cheatsheet_success(self) -> None:
         """Test successful cheatsheet search"""
-        # Clear any existing extractors
-        cheatsheet_extractors.clear()
+        # Clear existing extractors
+        # Access the global extractors dict from server module
+        if hasattr(docsetmcp.server, "cheatsheet_extractors"):
+            docsetmcp.server.cheatsheet_extractors.clear()
 
-        with patch("dashmcp.server.CheatsheetExtractor") as mock_class:
+        with patch("docsetmcp.server.CheatsheetExtractor") as mock_class:
             mock_instance = MagicMock()
             mock_instance.search.return_value = "# Git Cheatsheet\n## Results"
             mock_class.return_value = mock_instance
@@ -190,34 +207,39 @@ class TestCheatsheetMCPTools:
             assert "## Results" in result
             mock_instance.search.assert_called_once_with("branch", "", 10)
 
-    def test_search_cheatsheet_not_found(self):
+    def test_search_cheatsheet_not_found(self) -> None:
         """Test cheatsheet not found"""
-        cheatsheet_extractors.clear()
+        # Access the global extractors dict from server module
+        if hasattr(docsetmcp.server, "cheatsheet_extractors"):
+            docsetmcp.server.cheatsheet_extractors.clear()
 
-        with patch("dashmcp.server.CheatsheetExtractor") as mock_class:
+        with patch("docsetmcp.server.CheatsheetExtractor") as mock_class:
             mock_class.side_effect = FileNotFoundError("Not found")
 
-            with patch("dashmcp.server.list_available_cheatsheets") as mock_list:
+            with patch("docsetmcp.server.list_available_cheatsheets") as mock_list:
                 mock_list.return_value = "Available: Git, Vim"
 
                 result = search_cheatsheet("nonexistent")
                 assert "Error: Cheatsheet 'nonexistent' not found" in result
                 assert "Available: Git, Vim" in result
 
-    def test_search_cheatsheet_cached(self):
+    def test_search_cheatsheet_cached(self) -> None:
         """Test using cached cheatsheet extractor"""
         # Add a mock extractor to cache
         mock_extractor = MagicMock()
         mock_extractor.search.return_value = "Cached result"
-        cheatsheet_extractors["git"] = mock_extractor
+        # Add to the global extractors dict
+        if hasattr(docsetmcp.server, "cheatsheet_extractors"):
+            docsetmcp.server.cheatsheet_extractors["git"] = mock_extractor
 
         result = search_cheatsheet("git")
         assert result == "Cached result"
 
         # Clean up
-        cheatsheet_extractors.clear()
+        if hasattr(docsetmcp.server, "cheatsheet_extractors"):
+            docsetmcp.server.cheatsheet_extractors.clear()
 
-    def test_search_invalid_max_results(self):
+    def test_search_invalid_max_results(self) -> None:
         """Test invalid max_results parameter"""
         result = search_cheatsheet("git", max_results=100)
         assert "Error: max_results must be between 1 and 50" in result
@@ -226,8 +248,10 @@ class TestCheatsheetMCPTools:
         assert "Error: max_results must be between 1 and 50" in result
 
     @patch("os.path.expanduser")
-    @patch("dashmcp.server.Path")
-    def test_list_available_cheatsheets(self, mock_path_class, mock_expanduser):
+    @patch("docsetmcp.server.Path")
+    def test_list_available_cheatsheets(
+        self, mock_path_class: MagicMock, mock_expanduser: MagicMock
+    ) -> None:
         """Test listing available cheatsheets"""
         mock_expanduser.return_value = "/mock/path"
 
@@ -241,19 +265,31 @@ class TestCheatsheetMCPTools:
         git_dir.name = "Git"
         git_dir.is_dir.return_value = True
         git_dir.glob.return_value = [MagicMock()]  # Has docset
-        git_dir.__lt__ = lambda self, other: self.name < other.name
+
+        def git_lt(self: MagicMock, other: MagicMock) -> bool:
+            return self.name < other.name
+
+        git_dir.__lt__ = git_lt
 
         vim_dir = MagicMock()
         vim_dir.name = "Vim"
         vim_dir.is_dir.return_value = True
         vim_dir.glob.return_value = [MagicMock()]  # Has docset
-        vim_dir.__lt__ = lambda self, other: self.name < other.name
+
+        def vim_lt(self: MagicMock, other: MagicMock) -> bool:
+            return self.name < other.name
+
+        vim_dir.__lt__ = vim_lt
 
         empty_dir = MagicMock()
         empty_dir.name = "Empty"
         empty_dir.is_dir.return_value = True
         empty_dir.glob.return_value = []  # No docset
-        empty_dir.__lt__ = lambda self, other: self.name < other.name
+
+        def empty_lt(self: MagicMock, other: MagicMock) -> bool:
+            return self.name < other.name
+
+        empty_dir.__lt__ = empty_lt
 
         # Make iterdir return our mocks
         mock_path.iterdir.return_value = [git_dir, vim_dir, empty_dir]
@@ -266,8 +302,10 @@ class TestCheatsheetMCPTools:
         assert "Empty" not in result
 
     @patch("os.path.expanduser")
-    @patch("dashmcp.server.Path")
-    def test_list_available_cheatsheets_none(self, mock_path_class, mock_expanduser):
+    @patch("docsetmcp.server.Path")
+    def test_list_available_cheatsheets_none(
+        self, mock_path_class: MagicMock, mock_expanduser: MagicMock
+    ) -> None:
         """Test when no cheatsheets exist"""
         mock_expanduser.return_value = "/mock/path"
 
@@ -280,8 +318,10 @@ class TestCheatsheetMCPTools:
         assert "No cheatsheets found" in result
 
     @patch("os.path.expanduser")
-    @patch("dashmcp.server.Path")
-    def test_list_available_cheatsheets_no_dir(self, mock_path_class, mock_expanduser):
+    @patch("docsetmcp.server.Path")
+    def test_list_available_cheatsheets_no_dir(
+        self, mock_path_class: MagicMock, mock_expanduser: MagicMock
+    ) -> None:
         """Test when cheatsheets directory doesn't exist"""
         mock_expanduser.return_value = "/mock/path"
 

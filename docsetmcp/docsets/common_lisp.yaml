@@ -1,0 +1,11 @@
+name: Common Lisp
+description: Powerful, dynamic programming language
+docset_path: Common_Lisp/Common Lisp.docset
+languages:
+  - commonlisp
+types:
+  - func
+  - Variable
+  - macro
+  - tdef
+  - cl

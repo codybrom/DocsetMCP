@@ -1,1 +1,1 @@
-# Test package for dashmcp
+# Test package for docsetmcp

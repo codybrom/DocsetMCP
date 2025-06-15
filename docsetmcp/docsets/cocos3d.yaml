@@ -1,0 +1,14 @@
+name: Cocos3D
+description: 3D graphics framework built on Cocos2D
+docset_path: Cocos3D/Cocos3D.docset
+languages:
+  - rust
+types:
+  - instm
+  - instp
+  - clm
+  - cl
+  - intfm
+  - intfp
+  - cat
+  - intf

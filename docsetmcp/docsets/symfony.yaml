@@ -1,0 +1,12 @@
+name: Symfony
+description: PHP web application framework
+docset_path: Symfony/Symfony.docset
+languages:
+  - symfony
+types:
+  - Method
+  - Class
+  - Namespace
+  - Interface
+  - Constant
+  - Trait

@@ -1,0 +1,14 @@
+name: CodeIgniter
+description: Powerful PHP framework with a small footprint
+docset_path: CodeIgniter/CodeIgniter.docset
+languages:
+  - codeigniter
+types:
+  - Method
+  - Guide
+  - Function
+  - Class
+  - Helper
+  - Constant
+  - Property
+  - Interface

@@ -1,0 +1,11 @@
+name: CouchDB
+description: Apache CouchDB - NoSQL document database using JSON
+docset_path: CouchDB/CouchDB.docset
+languages:
+  - javascript
+types:
+  - Section
+  - Option
+  - Guide
+  - Request
+  - Function

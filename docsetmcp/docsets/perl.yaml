@@ -1,0 +1,9 @@
+name: Perl
+description: High-level programming language
+docset_path: Perl/Perl.docset
+languages:
+  - perl
+types:
+  - Module
+  - func
+  - Guide

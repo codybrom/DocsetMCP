@@ -1,0 +1,9 @@
+name: Less
+description: CSS pre-processor
+docset_path: Less/Less.docset
+languages:
+  - less
+types:
+  - Function
+  - Guide
+  - Category

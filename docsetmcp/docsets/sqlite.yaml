@@ -1,0 +1,8 @@
+name: SQLite
+description: Self-contained SQL database engine
+docset_path: SQLite/SQLite.docset
+languages:
+  - sqlite
+types:
+  - func
+  - macro

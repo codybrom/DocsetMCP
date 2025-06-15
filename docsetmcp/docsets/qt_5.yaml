@@ -1,0 +1,15 @@
+name: Qt 5
+description: Cross-platform application framework
+docset_path: Qt_5/Qt.docset
+languages:
+  - qt
+types:
+  - Function
+  - Property
+  - cl
+  - Method
+  - Type
+  - Macro
+  - Variable
+  - Module
+  - Namespace

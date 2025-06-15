@@ -1,0 +1,16 @@
+name: PHP
+description: Server-side scripting language
+docset_path: PHP/PHP.docset
+languages:
+  - php
+types:
+  - clm
+  - func
+  - Constant
+  - cl
+  - Property
+  - Setting
+  - Guide
+  - Function
+  - Interface
+  - Variable

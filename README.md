@@ -1,4 +1,4 @@
-# Unofficial Dash MCP Server
+# DocsetMCP - Unofficial Dash MCP Server
 
 Search local documentation from Dash docsets through the Model Context Protocol (MCP).
 
@@ -19,7 +19,8 @@ MCP (Model Context Protocol) is a standard for connecting AI assistants to exter
 
 - macOS (Dash is Mac-only)
 - [Dash](https://kapeli.com/dash) with desired docsets downloaded
-- Python 3.8 or higher
+- Python 3.10 or higher
+- UV package manager ([How to Install](https://docs.astral.sh/uv/getting-started/installation/))
 - An AI assistant that supports MCP (Claude Desktop, Claude Code CLI, Cursor IDE, etc.)
 
 ## Installation
@@ -29,7 +30,7 @@ MCP (Model Context Protocol) is a standard for connecting AI assistants to exter
 1. **Install from PyPI**:
 
    ```bash
-   pip install dashmcp
+   pip install docsetmcp
    ```
 
 2. **Configure your MCP client** (see configuration options below)
@@ -39,8 +40,8 @@ MCP (Model Context Protocol) is a standard for connecting AI assistants to exter
 1. **Clone and install**:
 
    ```bash
-   git clone https://github.com/codybrom/dashmcp.git
-   cd dashmcp
+   git clone https://github.com/codybrom/docsetmcp.git
+   cd docsetmcp
    pip install -e .
    ```
 
@@ -49,19 +50,19 @@ MCP (Model Context Protocol) is a standard for connecting AI assistants to exter
    ```bash
    # Install test dependencies
    pip install pytest pytest-cov pytest-xdist
-   
+
    # Run basic tests
    pytest tests/test_docsets.py::TestDocsets::test_yaml_structure -v
-   
+
    # Run quick tests (structure + existence checks)
    pytest tests/ -k "yaml_structure or test_docset_exists" -v
-   
+
    # Run full test suite (all docsets)
    pytest tests/ -v
-   
+
    # Run with coverage
-   pytest tests/ --cov=dashmcp --cov-report=html -v
-   
+   pytest tests/ --cov=docsetmcp --cov-report=html -v
+
    # Validate all local cheatsheets work (integration test)
    python scripts/validate_cheatsheets.py
    ```
@@ -76,8 +77,11 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 {
   "mcpServers": {
     "dash": {
+      "type": "stdio",
       "command": "uvx",
-      "args": ["dashmcp"]
+      "args": [
+        "docsetmcp"
+      ]
     }
   }
 }
@@ -88,10 +92,10 @@ Restart Claude Desktop.
 ### Claude Code CLI
 
 ```bash
-claude mcp add dash "uvx dashmcp"
+claude mcp add dash "uvx docsetmcp"
 
 # Or for all projects
-claude mcp add --scope user dash "uvx dashmcp"
+claude mcp add --scope user dash "uvx docsetmcp"
 ```
 
 ### Cursor or other MCP Clients that use `mcp.json`
@@ -103,7 +107,7 @@ Add/Update `mcp.json` in your project root:
   "mcpServers": {
     "dash": {
       "command": "uvx",
-      "args": ["dashmcp"]
+      "args": ["docsetmcp"]
     }
   }
 }
@@ -159,7 +163,7 @@ Search and extract documentation from any docset.
 **Parameters**:
 
 - `query` (required): The API/function name to search for
-- `docset` (optional): Docset to search in (default: "apple")
+- `docset` (optional): Docset to search in (default: "apple_api_reference")
 - `language` (optional): Programming language variant (varies by docset)
 - `max_results` (optional): 1-10 results (default: 3)
 
@@ -188,7 +192,7 @@ List available frameworks/types in a specific docset.
 
 **Parameters**:
 
-- `docset` (optional): Docset to list from (default: "apple")
+- `docset` (optional): Docset to list from (default: "apple_api_reference")
 - `filter` (optional): Filter framework/type names
 
 ## Troubleshooting
@@ -209,20 +213,20 @@ The MCP server:
 
 ## Adding New Docset Support
 
-To add support for a new docset, create a YAML configuration file in `dashmcp/config/docsets/`:
+To add support for a new docset, create a YAML configuration file in `docsetmcp/docsets/`:
 
 ### Simple Configuration
 
 For most docsets using standard tarix format:
 
 ```yaml
-# dashmcp/config/docsets/my_docset.yaml
+# docsetmcp/docsets/my_docset.yaml
 name: My Docset
-docset_name: My_Docset
-docset_path: My_Docset.docset
+description: Brief description of the docset
+docset_path: My_Docset/My_Docset.docset
 languages:
- - python
- - javascript
+  - python
+  - javascript
 types:
   - Class
   - Function
@@ -235,37 +239,41 @@ types:
 For docsets with special requirements:
 
 ```yaml
-# dashmcp/config/docsets/complex_docset.yaml
-name: Complex Docset
-docset_name: Complex_Docset
-docset_path: Complex_Docset.docset
-format: apple  # or "tarix" (default)
+name: Apple API Reference
+description: Complete Apple developer documentation for macOS, iOS, watchOS, and tvOS
+docset_name: Apple_API_Reference
+docset_path: Apple_API_Reference.docset
 languages:
-  swift:
-    filter: "swift/"
-    prefix: "Swift."
   objc:
-    filter: "objc/"
-    prefix: ""
+    filter: language=occ
+    prefix: lc
+  swift:
+    filter: language=swift
+    prefix: ls
 types:
-  Protocol: 0
-  Class: 1
-  Struct: 2
-  Function: 3
-framework_path_pattern: "documentation/(.*?)/"
-framework_path_extract: 1
+  - Method
+  - Property
+  - Constant
+  - Variable
+  - Constructor
+  - Function
+  - Type
+  - Struct
+  - Class
+  - Protocol
+format: apple
+framework_pattern: documentation/([^/]+)/
 ```
 
 ### Configuration Fields
 
 - **name**: Display name for the docset
-- **docset_name**: Exact folder name in Dash's DocSets directory
-- **docset_path**: Path to the .docset bundle
-- **languages**: List of supported languages (simple) or dict with filters/prefixes (advanced)
-- **types**: List of documentation types in priority order (simple) or dict with priority values (advanced)
+- **description**: Brief description of what the docset contains
+- **docset_path**: Full path to the .docset bundle including parent folder (e.g., "Python_3/Python 3.docset")
+- **languages**: List of supported languages (simple) or dict with language-specific filters/prefixes
+- **types**: List of documentation types in priority order
 - **format**: "tarix" (default) or "apple" for Apple's cache format
-- **framework_path_pattern**: Regex to extract framework names from paths
-- **framework_path_extract**: Regex group number to extract
+- **framework_pattern**: Pattern to identify framework names in paths (Apple format only)
 
 The ConfigLoader automatically applies smart defaults, so you only need to specify non-default values.
 

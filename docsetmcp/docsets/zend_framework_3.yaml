@@ -1,0 +1,13 @@
+name: Zend Framework 3
+description: Open source framework for PHP
+docset_path: Zend_Framework_3/Zend_Framework.docset
+languages:
+  - zend_framework
+types:
+  - clm
+  - Attribute
+  - Class
+  - ns
+  - Interface
+  - func
+  - Variable

@@ -5,3 +5,14 @@ sort_keys = true
 sequence_style = "block_style"
 line_length = 120
 section_whitelines = 0
+
+[tool.pyright]
+stubPath = "stubs"
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "strict"
+pythonVersion = "3.10"
+reportMissingImports = true
+reportUnnecessaryCast = true
+reportUntypedFunctionDecorator = "none"
+exclude = ["**/node_modules", "**/__pycache__", "**/.*", "build", "dist"]

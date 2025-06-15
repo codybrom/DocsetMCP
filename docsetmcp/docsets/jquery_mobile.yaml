@@ -1,0 +1,10 @@
+name: jQuery Mobile
+description: Touch-optimized web framework
+docset_path: jQuery_Mobile/jQuery Mobile.docset
+languages:
+  - jquerymobile
+types:
+  - cl
+  - Event
+  - func
+  - Category

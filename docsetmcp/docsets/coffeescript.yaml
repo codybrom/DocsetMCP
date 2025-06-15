@@ -1,0 +1,8 @@
+name: CoffeeScript
+description: Little language that compiles into JavaScript
+docset_path: CoffeeScript/CoffeeScript.docset
+languages:
+  - javascript
+types:
+  - Guide
+  - File

@@ -1,0 +1,12 @@
+name: VueJS (Options)
+description: VueJS (Options) documentation
+docset_path: VueJS/VueJS_(Options).docset
+languages:
+  - javascript
+types:
+  - Section
+  - Method
+  - Guide
+  - Directive
+  - Component
+  - Attribute

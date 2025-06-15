@@ -1,0 +1,13 @@
+name: Ruby 3
+description: Dynamic, open source programming language
+docset_path: Ruby_3/Ruby.docset
+languages:
+  - ruby
+types:
+  - Method
+  - Constant
+  - Attribute
+  - Class
+  - Module
+  - Guide
+  - Variable

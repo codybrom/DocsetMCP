@@ -1,0 +1,21 @@
+name: Django
+description: High-level Python web framework
+docset_path: Django/Django.docset
+languages:
+  - python
+types:
+  - Section
+  - Attribute
+  - Method
+  - Class
+  - Guide
+  - Function
+  - Setting
+  - Option
+  - Module
+  - Field
+  - Filter
+  - Exception
+  - Tag
+  - Command
+  - Variable

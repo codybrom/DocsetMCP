@@ -1,0 +1,15 @@
+name: Play_Scala
+description: Play Framework for Scala - reactive web framework
+docset_path: Play_Scala/Play_Scala.docset
+languages:
+  - javascript
+types:
+  - Function
+  - Constant
+  - Class
+  - Constructor
+  - Object
+  - Trait
+  - Package
+  - Type
+  - Variable

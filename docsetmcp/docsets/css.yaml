@@ -1,0 +1,16 @@
+name: CSS
+description: Cascading Style Sheets for styling web pages
+docset_path: CSS/CSS.docset
+languages:
+  - css
+types:
+  - instp
+  - Guide
+  - func
+  - cl
+  - Property
+  - Element
+  - tdef
+  - Type
+  - Function
+  - Class

@@ -1,0 +1,8 @@
+name: Doctrine_ORM
+description: Object-relational mapper for PHP
+docset_path: Doctrine_ORM/Doctrine_ORM.docset
+languages:
+  - doctrine_orm
+types:
+  - Section
+  - Guide

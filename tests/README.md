@@ -1,6 +1,6 @@
-# Test Suite for dashmcp
+# Test Suite for docsetmcp
 
-This directory contains comprehensive tests for dashmcp.
+This directory contains comprehensive tests for docsetmcp.
 
 ## Test Structure
 
@@ -27,7 +27,7 @@ Tests all docset configurations (165 total):
 Tests actual content extraction:
 
 - **test_apple_documentation** - Apple API reference extraction
-- **test_nodejs_documentation** - Node.js documentation extraction  
+- **test_nodejs_documentation** - Node.js documentation extraction
 - **test_python_documentation** - Python documentation extraction
 
 ### TestEdgeCases
@@ -41,17 +41,20 @@ Tests error handling and edge cases:
 ## Running Tests
 
 ```bash
-# Basic tests
-python run_tests.py
+# Run basic structure tests
+pytest tests/test_docsets.py::TestDocsets::test_yaml_structure -v
 
-# Quick tests (structure + existence)
-python run_tests.py --quick
+# Run quick tests (structure + existence)
+pytest tests/ -k "yaml_structure or test_docset_exists" -v
 
-# Full test suite (all docsets)
-python run_tests.py --full
+# Run full test suite (all docsets)
+pytest tests/ -v
 
-# With coverage
-python run_tests.py --coverage
+# Run with coverage
+pytest tests/ --cov=docsetmcp --cov-report=html -v
+
+# Run tests in parallel
+pytest tests/ -n auto -v
 ```
 
 ## Test Results

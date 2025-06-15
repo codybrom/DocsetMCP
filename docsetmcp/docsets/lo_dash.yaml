@@ -1,0 +1,8 @@
+name: Lo-Dash
+description: Lodash - JavaScript utility library
+docset_path: Lo-Dash/Lo-Dash.docset
+languages:
+  - lo-dash
+types:
+  - Method
+  - Property

@@ -1,8 +1,0 @@
-name: RequireJS
-description: JavaScript file and module loader
-docset_name: RequireJS
-docset_path: RequireJS.docset
-languages:
-  - javascript
-types:
-  - Guide

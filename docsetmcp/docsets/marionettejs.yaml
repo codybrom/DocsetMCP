@@ -1,0 +1,8 @@
+name: MarionetteJS
+description: Composite application library for Backbone.js
+docset_path: MarionetteJS/MarionetteJS.docset
+languages:
+  - javascript
+types:
+  - Guide
+  - Class

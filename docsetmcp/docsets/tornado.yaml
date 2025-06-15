@@ -1,0 +1,13 @@
+name: Tornado
+description: Python web framework and asynchronous networking
+docset_path: Tornado/Tornado.docset
+languages:
+  - tornado
+types:
+  - Method
+  - Class
+  - Function
+  - Attribute
+  - Module
+  - Guide
+  - Exception

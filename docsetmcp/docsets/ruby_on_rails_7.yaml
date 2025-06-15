@@ -1,0 +1,13 @@
+name: Ruby on Rails 7
+description: Web application framework
+docset_path: Ruby_on_Rails_7/Ruby on Rails.docset
+languages:
+  - ruby
+types:
+  - clm
+  - instm
+  - cl
+  - Module
+  - Attribute
+  - clconst
+  - Guide

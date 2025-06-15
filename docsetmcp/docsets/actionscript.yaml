@@ -1,0 +1,13 @@
+name: ActionScript
+description: Adobe ActionScript 3.0 reference documentation
+docset_path: ActionScript/ActionScript.docset
+languages:
+  - actionscript
+types:
+  - instp
+  - clm
+  - clconst
+  - cl
+  - Event
+  - Package
+  - Interface

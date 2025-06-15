@@ -1,0 +1,14 @@
+name: Kobold2D
+description: Extended version of Cocos2D for iOS and Mac OS
+docset_path: Kobold2D/Kobold2D.docset
+languages:
+  - kobold2d
+types:
+  - instm
+  - instp
+  - cl
+  - clm
+  - intfm
+  - intf
+  - intfp
+  - cat

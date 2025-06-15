@@ -1,0 +1,8 @@
+name: Neat
+description: Semantic grid framework for Sass and Bourbon
+docset_path: Neat/Neat.docset
+languages:
+  - neat
+types:
+  - Mixin
+  - Variable

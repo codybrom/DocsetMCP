@@ -1,7 +1,5 @@
 # Virtual environments
-.dashmd_mcp_venv/
-venv/
-env/
+.venv/
 
 # Python
 __pycache__/

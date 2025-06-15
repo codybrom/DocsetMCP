@@ -1,0 +1,16 @@
+name: Cocos2D
+description: Open source framework for building 2D games and apps
+docset_path: Cocos2D/Cocos2D.docset
+languages:
+  - cocos2d
+types:
+  - instm
+  - instp
+  - clm
+  - cl
+  - econst
+  - intfm
+  - tdef
+  - intf
+  - intfp
+  - cat

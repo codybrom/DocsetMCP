@@ -1,0 +1,12 @@
+name: Twig
+description: Flexible, fast, and secure template engine for PHP
+docset_path: Twig/Twig.docset
+languages:
+  - twig
+types:
+  - Filter
+  - Guide
+  - Operator
+  - Function
+  - Tag
+  - Test

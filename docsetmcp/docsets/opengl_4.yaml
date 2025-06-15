@@ -1,0 +1,7 @@
+name: OpenGL 4
+description: Cross-platform graphics API
+docset_path: OpenGL_4/OpenGL4.docset
+languages:
+  - opengl4
+types:
+  - Function

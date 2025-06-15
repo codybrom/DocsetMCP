@@ -1,0 +1,9 @@
+name: Nginx
+description: High-performance HTTP server and reverse proxy
+docset_path: Nginx/Nginx.docset
+languages:
+  - nginx
+types:
+  - Directive
+  - Variable
+  - Module

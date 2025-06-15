@@ -1,0 +1,7 @@
+name: PhoneGap
+description: Mobile development framework
+docset_path: PhoneGap/PhoneGap.docset
+languages:
+  - phonegap
+types:
+  - Guide

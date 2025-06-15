@@ -1,0 +1,13 @@
+name: Smarty
+description: Template engine for PHP
+docset_path: Smarty/Smarty.docset
+languages:
+  - php
+types:
+  - Sample
+  - Variable
+  - Method
+  - Guide
+  - Function
+  - Operator
+  - Constant

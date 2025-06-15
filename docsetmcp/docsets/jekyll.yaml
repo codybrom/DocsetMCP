@@ -1,0 +1,8 @@
+name: Jekyll
+description: Static site generator written in Ruby
+docset_path: Jekyll/Jekyll.docset
+languages:
+  - ruby
+types:
+  - Section
+  - Guide

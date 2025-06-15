@@ -1,0 +1,12 @@
+name: Ruby
+description: Dynamic, open source programming language
+docset_path: Ruby/Ruby.docset
+languages:
+  - ruby
+types:
+  - Method
+  - Constant
+  - Class
+  - Attribute
+  - Module
+  - Guide

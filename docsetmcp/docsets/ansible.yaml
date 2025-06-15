@@ -1,0 +1,13 @@
+name: Ansible
+description: Open-source automation platform for configuration management, application deployment, and task automation
+docset_path: Ansible/Ansible.docset
+languages:
+  - ansible
+  - yaml
+  - python
+types:
+  - Plugin
+  - Guide
+  - Setting
+  - Environment
+  - Collection

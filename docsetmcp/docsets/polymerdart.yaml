@@ -1,0 +1,14 @@
+name: Polymer.dart
+description: Web components library for Dart
+docset_path: Polymer.dart/Polymer.dart.docset
+languages:
+  - polymer.dart
+types:
+  - Property
+  - Method
+  - Operator
+  - Constructor
+  - Class
+  - Function
+  - Library
+  - Constant

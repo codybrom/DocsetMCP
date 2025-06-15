@@ -1,0 +1,12 @@
+name: Erlang
+description: Concurrent, fault-tolerant programming language
+docset_path: Erlang/Erlang.docset
+languages:
+  - erlang
+types:
+  - Function
+  - Section
+  - Type
+  - Module
+  - Guide
+  - Callback

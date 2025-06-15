@@ -1,0 +1,20 @@
+name: Cocos2D-X
+description: C++ port of Cocos2D for cross-platform game development
+docset_path: Cocos2D-X/Cocos2D-X.docset
+languages:
+  - rust
+types:
+  - clm
+  - Class
+  - Attribute
+  - econst
+  - Struct
+  - tdef
+  - func
+  - instm
+  - macro
+  - tmplt
+  - ns
+  - intf
+  - Variable
+  - Exception

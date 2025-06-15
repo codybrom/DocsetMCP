@@ -1,0 +1,24 @@
+name: C++
+description: General-purpose programming language with object-oriented features
+docset_path: C++/C++.docset
+languages:
+  cpp:
+    prefix: 'std::'
+types:
+  - clm
+  - func
+  - cl
+  - Operator
+  - macro
+  - Guide
+  - tdef
+  - clconst
+  - File
+  - Keyword
+  - Enum
+  - Tag
+  - Attribute
+  - Struct
+  - Global
+  - instp
+  - Directive

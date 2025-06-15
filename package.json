@@ -1,0 +1,14 @@
+{
+  "name": "docsetmcp",
+  "version": "0.2.0",
+  "description": "Model Context Protocol server for Dash-style docsets",
+  "scripts": {
+    "setup": "./scripts/setup_env.sh",
+    "spell": "cspell '**/*'",
+    "test": ".venv/bin/python -m pytest tests/ -v",
+    "format:py": ".venv/bin/python -m black docsetmcp/",
+    "format:yaml": ".venv/bin/yamlfix docsetmcp/docsets/*.yaml",
+    "lint": ".venv/bin/python -m pre_commit run --all-files",
+    "typecheck": ".venv/bin/python -m pyright"
+  }
+}

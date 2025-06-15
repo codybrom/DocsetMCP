@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test suite for dashmcp docset configurations
+Test suite for docsetmcp docset configurations
 """
 
 import os
@@ -9,12 +9,11 @@ import pytest
 import yaml
 import sqlite3
 from pathlib import Path
-from typing import Dict
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dashmcp.server import DashExtractor
+from docsetmcp.server import DashExtractor
 
 
 class TestDocsets:
@@ -23,12 +22,12 @@ class TestDocsets:
     @classmethod
     def setup_class(cls):
         """Setup test data"""
-        cls.config_dir = Path(__file__).parent.parent / "dashmcp" / "config" / "docsets"
+        cls.config_dir = Path(__file__).parent.parent / "docsetmcp" / "docsets"
         cls.yaml_files = sorted(
             list(cls.config_dir.glob("*.yaml")) + list(cls.config_dir.glob("*.yml"))
         )
 
-    def load_yaml_config(self, yaml_path: Path) -> Dict:
+    def load_yaml_config(self, yaml_path: Path) -> dict[str, object]:
         """Load YAML configuration file"""
         with open(yaml_path, "r") as f:
             return yaml.safe_load(f)
@@ -38,9 +37,7 @@ class TestDocsets:
         [
             pytest.param(p, id=p.name)
             for p in sorted(
-                (Path(__file__).parent.parent / "dashmcp" / "config" / "docsets").glob(
-                    "*.y*ml"
-                )
+                (Path(__file__).parent.parent / "docsetmcp" / "docsets").glob("*.y*ml")
             )
         ],
     )
@@ -52,8 +49,8 @@ class TestDocsets:
         dash_docsets_path = os.path.expanduser(
             "~/Library/Application Support/Dash/DocSets"
         )
-        docset_folder = config.get("docset_name", "")
-        docset_file = config.get("docset_path", "")
+        docset_folder = str(config.get("docset_name", ""))
+        docset_file = str(config.get("docset_path", ""))
         full_docset_path = Path(dash_docsets_path) / docset_folder / docset_file
 
         if not full_docset_path.exists():
@@ -64,15 +61,13 @@ class TestDocsets:
         [
             pytest.param(p, id=p.name)
             for p in sorted(
-                (Path(__file__).parent.parent / "dashmcp" / "config" / "docsets").glob(
-                    "*.y*ml"
-                )
+                (Path(__file__).parent.parent / "docsetmcp" / "docsets").glob("*.y*ml")
             )
         ],
     )
     def test_docset_search(self, yaml_path: Path):
         """Test that each docset can be searched successfully"""
-        from dashmcp.config_loader import ConfigLoader
+        from docsetmcp.config_loader import ConfigLoader
 
         # Load config through ConfigLoader to get defaults applied
         loader = ConfigLoader()
@@ -93,6 +88,7 @@ class TestDocsets:
             extractor = TestDashExtractor(docset_folder, config)
         except FileNotFoundError:
             pytest.skip(f"Docset not installed: {config.get('name', docset_folder)}")
+            return
 
         # Try various common search queries
         test_queries = [
@@ -127,15 +123,13 @@ class TestDocsets:
         [
             pytest.param(p, id=p.name)
             for p in sorted(
-                (Path(__file__).parent.parent / "dashmcp" / "config" / "docsets").glob(
-                    "*.y*ml"
-                )
+                (Path(__file__).parent.parent / "docsetmcp" / "docsets").glob("*.y*ml")
             )
         ],
     )
     def test_docset_types(self, yaml_path: Path):
         """Test that all configured types exist in the docset"""
-        from dashmcp.config_loader import ConfigLoader
+        from docsetmcp.config_loader import ConfigLoader
 
         # Load config through ConfigLoader to get defaults applied
         loader = ConfigLoader()
@@ -177,8 +171,8 @@ class TestDocsets:
 
             cursor.execute(
                 """
-                SELECT DISTINCT type 
-                FROM searchIndex 
+                SELECT DISTINCT type
+                FROM searchIndex
                 WHERE type != ''
             """
             )
@@ -187,9 +181,10 @@ class TestDocsets:
             conn.close()
         except (sqlite3.OperationalError, sqlite3.DatabaseError) as e:
             pytest.skip(f"Database error for {config.get('name', docset_folder)}: {e}")
+            return
 
         # Check each configured type
-        missing_types = []
+        missing_types: list[str] = []
         for configured_type in configured_types:
             if configured_type not in existing_types:
                 missing_types.append(configured_type)
@@ -200,11 +195,10 @@ class TestDocsets:
 
     def test_yaml_structure(self):
         """Test that all YAML files have the required structure"""
-        from dashmcp.config_loader import ConfigLoader
+        from docsetmcp.config_loader import ConfigLoader
 
         required_fields = [
             "name",
-            "docset_name",
             "docset_path",
             "format",
             "enabled",
@@ -231,27 +225,28 @@ class TestDocsets:
             ], f"{yaml_path.name} has invalid format: {config['format']}"
 
             # Check languages structure
+            languages = config["languages"]
             assert isinstance(
-                config["languages"], dict
+                languages, dict
             ), f"{yaml_path.name} languages must be a dict"
+            # After isinstance check, type checker knows languages is a dict
             assert (
-                len(config["languages"]) > 0
+                len(languages) > 0
             ), f"{yaml_path.name} must have at least one language"
 
             # Check types structure
-            assert isinstance(
-                config["types"], dict
-            ), f"{yaml_path.name} types must be a dict"
-            assert (
-                "default" in config["types"]
-            ), f"{yaml_path.name} types must have 'default'"
+            types = config["types"]
+            assert isinstance(types, dict), f"{yaml_path.name} types must be a dict"
+            # After isinstance check, type checker knows types is a dict
+            assert "default" in types, f"{yaml_path.name} types must have 'default'"
 
     def test_no_duplicate_names(self):
         """Test that there are no duplicate docset names"""
-        names = []
+        names: list[str] = []
         for yaml_path in self.yaml_files:
             config = self.load_yaml_config(yaml_path)
-            names.append(config.get("name", ""))
+            name = config.get("name", "")
+            names.append(str(name))
 
         duplicates = [name for name in names if names.count(name) > 1]
         assert not duplicates, f"Duplicate docset names found: {set(duplicates)}"
@@ -259,7 +254,7 @@ class TestDocsets:
     def test_server_initialization(self):
         """Test that the server can initialize with each docset"""
         # Get list of docsets that should work
-        working_docsets = []
+        working_docsets: list[str] = []
 
         for yaml_path in self.yaml_files:
             config = self.load_yaml_config(yaml_path)
@@ -273,7 +268,9 @@ class TestDocsets:
                 )
                 docset_folder = config.get("docset_name", "")
                 docset_file = config.get("docset_path", "")
-                full_docset_path = Path(dash_docsets_path) / docset_folder / docset_file
+                full_docset_path = (
+                    Path(dash_docsets_path) / str(docset_folder) / str(docset_file)
+                )
 
                 if full_docset_path.exists():
                     working_docsets.append(docset_type)
@@ -289,7 +286,7 @@ class TestDocsetContent:
     def test_apple_documentation(self):
         """Test Apple documentation extraction"""
         try:
-            extractor = DashExtractor("apple")
+            extractor = DashExtractor("apple_api_reference")
             result = extractor.search("URLSession", language="swift", max_results=1)
             assert "URLSession" in result
             assert "class" in result.lower() or "protocol" in result.lower()
@@ -331,7 +328,7 @@ class TestEdgeCases:
     def test_empty_search_query(self):
         """Test handling of empty search query"""
         try:
-            extractor = DashExtractor("apple")
+            extractor = DashExtractor("apple_api_reference")
             result = extractor.search("", language="swift", max_results=1)
             # Should return no results or error message
             assert (
@@ -345,7 +342,7 @@ class TestEdgeCases:
     def test_special_characters_in_search(self):
         """Test handling of special characters in search"""
         try:
-            extractor = DashExtractor("apple")
+            extractor = DashExtractor("apple_api_reference")
             # Test with various special characters
             for query in ["@#$%", "<<<", "'''", '"""']:
                 result = extractor.search(query, language="swift", max_results=1)

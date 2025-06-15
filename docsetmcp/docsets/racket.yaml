@@ -1,0 +1,38 @@
+name: Racket
+description: General-purpose programming language
+docset_path: Racket/Racket.docset
+languages:
+  - javascript
+types:
+  - Procedure
+  - Value
+  - Syntax
+  - Module
+  - Method
+  - Struct
+  - Parameter
+  - Transformer
+  - Class
+  - Type
+  - Interface
+  - Constructor
+  - Mixin
+  - Функция
+  - Signature
+  - Setting
+  - Function
+  - Property
+  - Operator
+  - Instance
+  - Flag
+  - Синтаксис
+  - 接口
+  - Macro
+  - Параметр
+  - Constant
+  - 关键字
+  - Variable
+  - Binding
+  - 语法
+  - Константа
+  - Значение

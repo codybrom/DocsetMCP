@@ -1,0 +1,14 @@
+name: Pandas
+description: Python data analysis library
+docset_path: Pandas/Pandas.docset
+languages:
+  - python
+types:
+  - Section
+  - Method
+  - Attribute
+  - Guide
+  - Function
+  - Class
+  - Exception
+  - Module

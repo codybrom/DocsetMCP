@@ -1,0 +1,9 @@
+name: Susy
+description: Responsive layout toolkit for Sass
+docset_path: Susy/Susy.docset
+languages:
+  - susy
+types:
+  - Function
+  - Guide
+  - Variable

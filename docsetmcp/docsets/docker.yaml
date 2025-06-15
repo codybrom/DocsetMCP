@@ -1,0 +1,9 @@
+name: Docker
+description: Platform for developing, shipping, and running applications in containers
+docset_path: Docker/Docker.docset
+languages:
+  - rust
+types:
+  - Section
+  - Guide
+  - Command

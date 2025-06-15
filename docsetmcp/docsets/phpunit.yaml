@@ -1,0 +1,12 @@
+name: PHPUnit
+description: Unit testing framework for PHP
+docset_path: PHPUnit/PHPUnit.docset
+languages:
+  - php
+types:
+  - Sample
+  - Method
+  - Section
+  - Attribute
+  - Guide
+  - Element

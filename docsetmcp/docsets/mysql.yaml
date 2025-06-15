@@ -1,0 +1,13 @@
+name: MySQL
+description: Open-source relational database
+docset_path: MySQL/MySQL.docset
+languages:
+  - mysql
+types:
+  - Error
+  - Section
+  - Variable
+  - Function
+  - Operator
+  - Option
+  - Macro

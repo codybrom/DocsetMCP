@@ -1,0 +1,12 @@
+name: Zend Framework 1
+description: Open source framework for PHP
+docset_path: Zend_Framework_1/Zend_Framework.docset
+languages:
+  - zend_framework
+types:
+  - clm
+  - Attribute
+  - Class
+  - Interface
+  - ns
+  - cat

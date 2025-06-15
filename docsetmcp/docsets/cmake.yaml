@@ -1,0 +1,11 @@
+name: CMake
+description: Cross-platform build system generator
+docset_path: CMake/CMake.docset
+languages:
+  - ruby
+types:
+  - Variable
+  - Property
+  - Command
+  - Module
+  - Guide

@@ -1,0 +1,16 @@
+name: C
+description: General-purpose programming language for system and application development
+docset_path: C/C.docset
+languages:
+  - c
+types:
+  - macro
+  - func
+  - Guide
+  - tdef
+  - Keyword
+  - File
+  - Attribute
+  - Struct
+  - Enum
+  - clconst

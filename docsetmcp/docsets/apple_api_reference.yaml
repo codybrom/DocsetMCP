@@ -1,0 +1,34 @@
+name: Apple API Reference
+description: Complete Apple developer documentation for macOS, iOS, watchOS, and tvOS
+docset_path: Apple_API_Reference/Apple_API_Reference.docset
+languages:
+  objc:
+    filter: language=occ
+    prefix: lc
+  swift:
+    filter: language=swift
+    prefix: ls
+types:
+  - Method
+  - Property
+  - Constant
+  - Variable
+  - Constructor
+  - Function
+  - Type
+  - Struct
+  - Macro
+  - Class
+  - Operator
+  - Guide
+  - Enum
+  - Section
+  - Protocol
+  - Script
+  - Sample
+  - Framework
+  - Category
+  - Union
+  - Namespace
+format: apple
+framework_pattern: documentation/([^/]+)/

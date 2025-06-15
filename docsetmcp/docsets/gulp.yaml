@@ -1,0 +1,9 @@
+name: Gulp
+description: Streaming build system
+docset_path: Gulp/Gulp.docset
+languages:
+  - javascript
+types:
+  - Sample
+  - Guide
+  - Method

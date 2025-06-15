@@ -1,0 +1,21 @@
+name: Python 3
+description: Modern Python programming language
+docset_path: Python_3/Python 3.docset
+languages:
+  - python
+types:
+  - Method
+  - Function
+  - Attribute
+  - Section
+  - Class
+  - Module
+  - Option
+  - Exception
+  - Guide
+  - Macro
+  - Constant
+  - Type
+  - Variable
+  - Statement
+  - Struct

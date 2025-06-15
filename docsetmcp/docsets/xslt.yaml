@@ -1,0 +1,9 @@
+name: XSLT
+description: Language for transforming XML documents
+docset_path: XSLT/XSLT.docset
+languages:
+  - xslt
+types:
+  - Function
+  - Element
+  - Property

@@ -1,0 +1,13 @@
+name: SciPy
+description: Python library for scientific computing
+docset_path: SciPy/SciPy.docset
+languages:
+  - scipy
+types:
+  - Method
+  - Function
+  - Attribute
+  - Guide
+  - Class
+  - Module
+  - Exception

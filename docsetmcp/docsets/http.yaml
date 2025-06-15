@@ -1,0 +1,10 @@
+name: HTTP
+description: Hypertext Transfer Protocol documentation
+docset_path: HTTP/HTTP.docset
+languages:
+  - http
+types:
+  - Header
+  - Response Code
+  - Guide
+  - Method

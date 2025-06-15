@@ -1,0 +1,14 @@
+name: PostgreSQL
+description: Advanced open source relational database
+docset_path: PostgreSQL/PostgreSQL.docset
+languages:
+  - python
+types:
+  - Function
+  - Query
+  - Setting
+  - Error
+  - Type
+  - View
+  - Procedure
+  - Guide

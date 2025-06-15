@@ -1,0 +1,8 @@
+name: Boost
+description: Boost C++ Libraries - collection of peer-reviewed portable C++ source libraries
+docset_path: Boost/Boost.docset
+languages:
+  cpp:
+    prefix: 'boost::'
+types:
+  - Library

@@ -1,0 +1,10 @@
+name: Sinon
+description: Sinon.js - test spies, stubs and mocks for JavaScript
+docset_path: Sinon/Sinon.docset
+languages:
+  - sinon
+types:
+  - Method
+  - Section
+  - Property
+  - Guide

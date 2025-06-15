@@ -1,0 +1,7 @@
+name: ElasticSearch
+description: Distributed, RESTful search and analytics engine
+docset_path: ElasticSearch/ElasticSearch.docset
+languages:
+  - elasticsearch
+types:
+  - Guide

@@ -1,0 +1,8 @@
+name: D3JS
+description: JavaScript library for manipulating documents based on data
+docset_path: D3JS/D3JS.docset
+languages:
+  - javascript
+types:
+  - Function
+  - Module

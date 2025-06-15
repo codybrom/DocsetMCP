@@ -1,0 +1,13 @@
+name: Yii
+description: High-performance PHP framework
+docset_path: Yii/Yii.docset
+languages:
+  - yii
+types:
+  - clm
+  - intfp
+  - cl
+  - Guide
+  - Event
+  - Interface
+  - Trait

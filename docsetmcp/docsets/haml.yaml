@@ -1,0 +1,10 @@
+name: Haml
+description: HTML abstraction markup language
+docset_path: Haml/Haml.docset
+languages:
+  - ruby
+  - javascript
+types:
+  - Guide
+  - Filter
+  - Method

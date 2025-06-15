@@ -1,0 +1,8 @@
+name: Meteor
+description: Full-stack JavaScript platform
+docset_path: Meteor/Meteor.docset
+languages:
+  - meteor
+types:
+  - Section
+  - Guide

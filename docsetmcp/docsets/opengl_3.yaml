@@ -1,0 +1,7 @@
+name: OpenGL 3
+description: Cross-platform graphics API
+docset_path: OpenGL_3/OpenGL3.docset
+languages:
+  - opengl3
+types:
+  - func

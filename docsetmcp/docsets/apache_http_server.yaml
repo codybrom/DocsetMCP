@@ -1,0 +1,12 @@
+name: Apache HTTP Server
+description: Powerful, flexible, open-source web server
+docset_path: Apache_HTTP_Server/Apache_HTTP_Server.docset
+languages:
+  - apache
+  - conf
+  - apacheconf
+types:
+  - Directive
+  - Module
+  - Guide
+  - Command

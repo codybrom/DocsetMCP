@@ -1,0 +1,14 @@
+name: Emacs Lisp
+description: Dialect of Lisp for Emacs customization
+docset_path: Emacs_Lisp/Emacs Lisp.docset
+languages:
+  - emacslisp
+types:
+  - Function
+  - Variable
+  - Command
+  - Option
+  - Macro
+  - Pattern
+  - Constant
+  - Type

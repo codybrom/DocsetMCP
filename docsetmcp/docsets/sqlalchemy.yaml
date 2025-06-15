@@ -1,0 +1,15 @@
+name: SQLAlchemy
+description: Python SQL toolkit and ORM
+docset_path: SQLAlchemy/SQLAlchemy.docset
+languages:
+  - sqlalchemy
+types:
+  - Parameter
+  - Method
+  - Attribute
+  - Section
+  - Class
+  - Function
+  - Guide
+  - Module
+  - Exception

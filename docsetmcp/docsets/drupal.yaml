@@ -1,0 +1,14 @@
+name: Drupal
+description: Open source content management framework
+docset_path: Drupal/Drupal.docset
+languages:
+  - php
+types:
+  - Method
+  - Property
+  - File
+  - Class
+  - Constant
+  - Function
+  - Guide
+  - Global

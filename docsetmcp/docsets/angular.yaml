@@ -1,0 +1,25 @@
+name: Angular
+description: Angular framework documentation - modern TypeScript-based web application platform
+docset_path: Angular/Angular.docset
+languages:
+  - typescript
+  - javascript
+types:
+  - Section
+  - Method
+  - Property
+  - Constant
+  - Guide
+  - Class
+  - Function
+  - Interface
+  - Type
+  - Directive
+  - Package
+  - Enum
+  - Module
+  - Decorator
+  - Pipe
+  - Global
+  - Block
+  - Element

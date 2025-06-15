@@ -1,0 +1,7 @@
+name: Markdown
+description: Lightweight markup language
+docset_path: Markdown/Markdown.docset
+languages:
+  - markdown
+types:
+  - Guide

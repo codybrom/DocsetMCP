@@ -1,0 +1,11 @@
+name: Semantic UI
+description: User interface framework
+docset_path: Semantic_UI/Semantic UI.docset
+languages:
+  - semanticui
+types:
+  - Element
+  - Module
+  - Guide
+  - View
+  - Collection

@@ -1,103 +1,67 @@
 {
-    // Python formatting
-    "python.formatting.provider": "black",
-    "python.formatting.blackArgs": [
-        "--line-length",
-        "88"
-    ],
-    "editor.formatOnSave": true,
     "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
             "source.organizeImports": "explicit"
-        }
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
     },
     // YAML formatting
     "[yaml]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": false // Disable Prettier for YAML since we use yamlfix
+        "editor.formatOnSave": false
+    },
+    // Spell checker configuration
+    "cSpell.customDictionaries": {
+        "docsetmcp": {
+            "addWords": true,
+            "name": "docsetmcp",
+            "path": "${workspaceFolder}/.cspell.json",
+            "scope": "workspace"
+        }
+    },
+    "cSpell.enabledFileTypes": {
+        "javascript": true,
+        "json": true,
+        "markdown": true,
+        "plaintext": true,
+        "python": true,
+        "typescript": true,
+        "yaml": true
+    },
+    "editor.formatOnSave": true,
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "cmd": "${workspaceFolder}/.venv/bin/yamlfix ${file}",
+                "isAsync": true,
+                "match": "\\.ya?ml$"
+            }
+        ]
     },
     // Pre-commit integration
     "files.associations": {
         "*.yaml": "yaml",
         "*.yml": "yaml"
     },
-    // Run formatters on save via tasks
-    "emeraldwalk.runonsave": {
-        "commands": [
-            {
-                "match": "\\.ya?ml$",
-                "cmd": "yamlfix ${file}"
-            }
-        ]
+    "files.exclude": {
+        ".coverage": true,
+        ".mypy_cache": true,
+        ".pytest_cache": true,
+        "*.egg-info": true,
+        "**/__pycache__": true,
+        "**/*.pyc": true,
     },
-    // Python linting
-    "python.linting.enabled": true,
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Args": [
-        "--max-line-length=88",
-        "--extend-ignore=E203"
-    ],
-    // Test discovery
-    "python.testing.pytestEnabled": true,
-    "python.testing.unittestEnabled": false,
+    "npm.exclude": "**/\\.venv/**",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.terminal.activateEnvironment": true,
     "python.testing.pytestArgs": [
         "tests"
     ],
-    // Exclude directories
-    "files.exclude": {
-        "**/__pycache__": true,
-        "**/*.pyc": true,
-        ".pytest_cache": true,
-        "*.egg-info": true,
-        ".coverage": true,
-        "htmlcov": true
-    },
-    // Spell checker words
-    "cSpell.words": [
-        "actionscript",
-        "Akka",
-        "applescript",
-        "backbonejs",
-        "brotli",
-        "Codenames",
-        "CUDA",
-        "Docset",
-        "docsets",
-        "dsidx",
-        "dzil",
-        "flake8",
-        "Gitmoji",
-        "Grafx",
-        "Haml",
-        "Jasminej",
-        "Joomla",
-        "Keybaseio",
-        "Laravel",
-        "LLDB",
-        "Magit",
-        "Matplotlib",
-        "Netcat",
-        "Prezto",
-        "pumadev",
-        "pytest",
-        "RBQL",
-        "Sencha",
-        "Siteleaf",
-        "sproutcore",
-        "Susy",
-        "Symfony",
-        "tarix",
-        "Textastic",
-        "Vimdiff",
-        "Visidata",
-        "xdist",
-        "yamlfix",
-        "Zepto",
-        "cheatsheet",
-        "cheatsheets",
-        "fastmcp",
-        "tarindex"
-    ]
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false
 }

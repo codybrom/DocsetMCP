@@ -1,0 +1,22 @@
+name: OpenCV
+description: Open source computer vision library
+docset_path: OpenCV/OpenCV.docset
+languages:
+  - opencv
+types:
+  - instm
+  - func
+  - econst
+  - data
+  - cl
+  - tdef
+  - macro
+  - Guide
+  - tmplt
+  - clm
+  - enum
+  - ns
+  - ffunc
+  - instp
+  - intf
+  - intfm

@@ -10,24 +10,27 @@ Usage: python scripts/validate_cheatsheets.py
 import sys
 import os
 
-# Suppress loading messages
-import builtins
+# Suppress loading messages during import
+_original_stdout = sys.stdout
+_original_stderr = sys.stderr
+sys.stdout = open(os.devnull, "w")
+sys.stderr = open(os.devnull, "w")
 
-_original_print = builtins.print
-builtins.print = lambda *args, **kwargs: None
-
-from dashmcp.server import (
+from docsetmcp.server import (
     list_available_cheatsheets,
     list_cheatsheet_categories,
     search_cheatsheet,
     CheatsheetExtractor,
 )
 
-# Restore print
-builtins.print = _original_print
+# Restore stdout/stderr
+sys.stdout.close()
+sys.stderr.close()
+sys.stdout = _original_stdout
+sys.stderr = _original_stderr
 
 
-def test_cheatsheet(name):
+def test_cheatsheet(name: str) -> bool:
     """Test a single cheatsheet"""
     print(f"\n{'='*60}")
     print(f"Testing: {name}")
@@ -80,12 +83,12 @@ def test_cheatsheet(name):
         return False
 
 
-def main():
+def main() -> None:
     # Get list of all cheatsheets
     result = list_available_cheatsheets()
 
     # Parse the cheatsheet names
-    cheatsheets = []
+    cheatsheets: list[str] = []
     for line in result.split("\n"):
         if line.startswith("- **"):
             # Extract the simplified name
@@ -98,7 +101,7 @@ def main():
 
     # Test each cheatsheet
     success_count = 0
-    failed = []
+    failed: list[str] = []
 
     for cs in cheatsheets:
         if test_cheatsheet(cs):

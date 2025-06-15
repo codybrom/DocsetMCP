@@ -1,0 +1,10 @@
+name: Haskell
+description: Purely functional programming language
+docset_path: Haskell/Haskell.docset
+languages:
+  - haskell
+types:
+  - func
+  - Type
+  - Module
+  - Class

@@ -1,0 +1,11 @@
+name: WordPress
+description: Content management system
+docset_path: WordPress/WordPress.docset
+languages:
+  - wordpress
+types:
+  - Method
+  - Function
+  - Hook
+  - Class
+  - Guide

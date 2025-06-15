@@ -1,0 +1,16 @@
+name: Elixir
+description: Dynamic, functional language for building scalable applications
+docset_path: Elixir/Elixir.docset
+languages:
+  - elixir
+types:
+  - Function
+  - Section
+  - Type
+  - Module
+  - Macro
+  - Callback
+  - Guide
+  - Exception
+  - Protocol
+  - Struct

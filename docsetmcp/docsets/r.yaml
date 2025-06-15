@@ -1,0 +1,8 @@
+name: R
+description: Language for statistical computing
+docset_path: R/R.docset
+languages:
+  - r
+types:
+  - Function
+  - Package

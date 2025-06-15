@@ -1,0 +1,15 @@
+name: PrototypeJS
+description: JavaScript framework
+docset_path: PrototypeJS/PrototypeJS.docset
+languages:
+  - javascript
+types:
+  - Method
+  - Class
+  - Property
+  - Constructor
+  - Namespace
+  - Function
+  - Section
+  - Mixin
+  - Constant

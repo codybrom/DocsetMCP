@@ -1,0 +1,14 @@
+name: Jinja
+description: Modern templating engine for Python
+docset_path: Jinja/Jinja.docset
+languages:
+  - jinja
+types:
+  - Class
+  - Function
+  - Method
+  - Section
+  - Attribute
+  - Guide
+  - Exception
+  - Module

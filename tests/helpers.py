@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """
-Test helpers for dashmcp
+Test helpers for docsetmcp
 """
 
 import os
 import sqlite3
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+
+
+# Import the actual config type from shared types
+from docsetmcp.types import ProcessedDocsetConfig
 
 
 class TestDashExtractor:
     """Modified DashExtractor for testing individual configurations"""
 
-    def __init__(self, docset_folder: str, config: dict):
+    def __init__(self, docset_folder: str, config: ProcessedDocsetConfig):
         """Initialize with a specific configuration dictionary"""
         self.config = config
 
@@ -41,10 +44,10 @@ class TestDashExtractor:
             raise FileNotFoundError(f"{self.config['name']} not found at {self.docset}")
 
     def search(
-        self, query: str, language: Optional[str] = None, limit: int = 10
-    ) -> List[Dict[str, Any]]:
+        self, query: str, language: str | None = None, limit: int = 10
+    ) -> list[dict[str, str]]:
         """Search for documentation"""
-        results = []
+        results: list[dict[str, str]] = []
 
         # Use first language if not specified
         if language is None and self.config.get("languages"):
@@ -65,8 +68,8 @@ class TestDashExtractor:
             # Exact match first with language filter
             cursor.execute(
                 """
-                SELECT name, type, path 
-                FROM searchIndex 
+                SELECT name, type, path
+                FROM searchIndex
                 WHERE name = ? AND path LIKE ?
                 LIMIT ?
                 """,
@@ -76,8 +79,8 @@ class TestDashExtractor:
             # Exact match without language filter
             cursor.execute(
                 """
-                SELECT name, type, path 
-                FROM searchIndex 
+                SELECT name, type, path
+                FROM searchIndex
                 WHERE name = ?
                 LIMIT ?
                 """,
@@ -91,8 +94,8 @@ class TestDashExtractor:
             if lang_filter:
                 cursor.execute(
                     """
-                    SELECT name, type, path 
-                    FROM searchIndex 
+                    SELECT name, type, path
+                    FROM searchIndex
                     WHERE name LIKE ? AND path LIKE ?
                     LIMIT ?
                     """,
@@ -101,8 +104,8 @@ class TestDashExtractor:
             else:
                 cursor.execute(
                     """
-                    SELECT name, type, path 
-                    FROM searchIndex 
+                    SELECT name, type, path
+                    FROM searchIndex
                     WHERE name LIKE ?
                     LIMIT ?
                     """,

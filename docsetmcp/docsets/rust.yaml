@@ -1,0 +1,21 @@
+name: Rust
+description: Systems programming language focused on safety
+docset_path: Rust/Rust.docset
+languages:
+  - rust
+types:
+  - Method
+  - Type
+  - Section
+  - Guide
+  - Function
+  - _Struct
+  - Constant
+  - Variant
+  - Trait
+  - Field
+  - Module
+  - Macro
+  - Enum
+  - Keyword
+  - Union

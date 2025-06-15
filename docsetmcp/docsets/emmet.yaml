@@ -1,0 +1,9 @@
+name: Emmet
+description: Toolkit for high-speed HTML and CSS coding
+docset_path: Emmet/Emmet.docset
+languages:
+  - emmet
+types:
+  - Directive
+  - Section
+  - Category

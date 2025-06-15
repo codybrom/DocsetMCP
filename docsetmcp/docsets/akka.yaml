@@ -1,0 +1,16 @@
+name: Akka
+description: Akka toolkit for building highly concurrent, distributed applications
+docset_path: Akka/Akka.docset
+languages:
+  - scala
+  - java
+types:
+  - Function
+  - Constant
+  - Class
+  - Constructor
+  - Object
+  - Trait
+  - Package
+  - Type
+  - Variable

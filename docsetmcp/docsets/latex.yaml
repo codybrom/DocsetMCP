@@ -1,0 +1,9 @@
+name: LaTeX
+description: Document preparation system
+docset_path: LaTeX/LaTeX.docset
+languages:
+  - latex
+types:
+  - Command
+  - Guide
+  - Environment

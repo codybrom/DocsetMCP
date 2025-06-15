@@ -1,0 +1,13 @@
+name: Clojure
+description: Modern, functional dialect of Lisp on the Java platform
+docset_path: Clojure/Clojure.docset
+languages:
+  - javascript
+types:
+  - Function
+  - Macro
+  - Type
+  - Namespace
+  - Protocol
+  - Variable
+  - Record

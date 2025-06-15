@@ -1,0 +1,14 @@
+name: MooTools
+description: Compact JavaScript framework
+docset_path: MooTools/MooTools.docset
+languages:
+  - mootools
+types:
+  - Method
+  - Function
+  - Class
+  - Constructor
+  - Type
+  - Property
+  - Object
+  - Event

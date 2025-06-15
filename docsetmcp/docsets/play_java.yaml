@@ -1,0 +1,16 @@
+name: Play_Java
+description: Play Framework for Java - reactive web framework
+docset_path: Play_Java/Play_Java.docset
+languages:
+  - play_java
+types:
+  - Method
+  - Constructor
+  - Class
+  - Field
+  - Interface
+  - Package
+  - Notation
+  - Constant
+  - Enum
+  - Exception

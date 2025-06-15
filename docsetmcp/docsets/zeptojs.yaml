@@ -1,0 +1,8 @@
+name: ZeptoJS
+description: Minimalist JavaScript library
+docset_path: ZeptoJS/ZeptoJS.docset
+languages:
+  - javascript
+types:
+  - Method
+  - Module

@@ -1,0 +1,16 @@
+name: NumPy
+description: Fundamental package for scientific computing in Python
+docset_path: NumPy/NumPy.docset
+languages:
+  - numpy
+types:
+  - Function
+  - Method
+  - Attribute
+  - Guide
+  - Macro
+  - Enum
+  - Type
+  - Class
+  - Module
+  - Exception

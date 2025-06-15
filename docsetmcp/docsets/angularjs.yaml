@@ -1,0 +1,16 @@
+name: AngularJS
+description: AngularJS (1.x) - Superheroic JavaScript MVW Framework
+docset_path: AngularJS/AngularJS.docset
+languages:
+  - javascript
+types:
+  - Method
+  - Directive
+  - Service
+  - Property
+  - func
+  - Guide
+  - Type
+  - Module
+  - Event
+  - Filter

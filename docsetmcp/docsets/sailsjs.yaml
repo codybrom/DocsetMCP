@@ -1,0 +1,14 @@
+name: SailsJS
+description: Realtime MVC framework for Node.js
+docset_path: SailsJS/SailsJS.docset
+languages:
+  - javascript
+types:
+  - Method
+  - Guide
+  - Property
+  - Setting
+  - Class
+  - Service
+  - Command
+  - Hook

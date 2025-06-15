@@ -1,0 +1,9 @@
+name: Font_Awesome
+description: Icon toolkit based on CSS and Less
+docset_path: Font_Awesome/Font_Awesome.docset
+languages:
+  - javascript
+types:
+  - Entry
+  - Class
+  - Category

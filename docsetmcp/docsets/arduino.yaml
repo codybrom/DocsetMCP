@@ -1,0 +1,19 @@
+name: Arduino
+description: Open-source electronics platform based on easy-to-use hardware and software
+docset_path: Arduino/Arduino.docset
+languages:
+  - arduino
+  - c
+  - cpp
+  - c++
+  - ino
+types:
+  - Function
+  - Sample
+  - Class
+  - Operator
+  - Type
+  - Statement
+  - Constant
+  - Keyword
+  - Guide
