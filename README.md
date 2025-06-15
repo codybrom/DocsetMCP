@@ -70,13 +70,14 @@ MCP (Model Context Protocol) is a standard for connecting AI assistants to exter
 
 ### Claude Desktop
 
-Open `~/Library/Application Support/Claude/claude_desktop_config.json` and add:
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "dash": {
-      "command": "dashmcp"
+      "command": "uvx",
+      "args": ["dashmcp"]
     }
   }
 }
@@ -86,28 +87,23 @@ Restart Claude Desktop.
 
 ### Claude Code CLI
 
-Add the server using the CLI:
-
 ```bash
-# Add locally (current project only)
-claude mcp add dash dashmcp
+claude mcp add dash "uvx dashmcp"
 
-# Add for all projects
-claude mcp add --scope user dash dashmcp
-
-# List configured servers
-claude mcp list
+# Or for all projects
+claude mcp add --scope user dash "uvx dashmcp"
 ```
 
-### Cursor IDE
+### Cursor or other MCP Clients that use `mcp.json`
 
-Create `.cursor/mcp.json` in your project root:
+Add/Update `mcp.json` in your project root:
 
 ```json
 {
   "mcpServers": {
     "dash": {
-      "command": "dashmcp"
+      "command": "uvx",
+      "args": ["dashmcp"]
     }
   }
 }

@@ -13,18 +13,10 @@ __pycache__/
 dist/
 build/
 *.egg-info/
-
-
+.pypirc
 
 # macOS
 .DS_Store
 
 # Logs
 *.log
-
-# Cache
-.dash_cache/
-
-# Launcher
-dashmd-mcp
-EOF < /dev/null
