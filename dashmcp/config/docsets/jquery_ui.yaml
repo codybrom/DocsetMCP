@@ -1,0 +1,9 @@
+name: jQuery UI
+description: Curated set of user interface interactions
+docset_name: jQuery_UI
+docset_path: jQuery UI.docset
+languages:
+  - jqueryui
+types:
+  - cl
+  - func

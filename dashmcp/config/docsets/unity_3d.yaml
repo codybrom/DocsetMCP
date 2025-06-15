@@ -1,0 +1,21 @@
+name: Unity 3D
+description: Cross-platform game engine
+docset_name: Unity_3D
+docset_path: Unity 3D.docset
+languages:
+  - unity3d
+types:
+  - Property
+  - Method
+  - Field
+  - Class
+  - Guide
+  - Operator
+  - Constructor
+  - Struct
+  - Enum
+  - Event
+  - Interface
+  - Delegate
+  - Namespace
+  - Module

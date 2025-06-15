@@ -1,0 +1,17 @@
+name: Groovy
+description: Powerful, dynamic language for the Java platform
+docset_name: Groovy
+docset_path: Groovy.docset
+languages:
+  - groovy
+types:
+  - Method
+  - Field
+  - Class
+  - Constructor
+  - Property
+  - Interface
+  - Constant
+  - Notation
+  - Enum
+  - Package

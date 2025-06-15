@@ -1,0 +1,17 @@
+name: Java
+description: Object-oriented programming language
+docset_name: Java
+docset_path: Java.docset
+languages:
+  - javascript
+types:
+  - Method
+  - Field
+  - Constructor
+  - Class
+  - Interface
+  - Section
+  - Constant
+  - Package
+  - Module
+  - Element

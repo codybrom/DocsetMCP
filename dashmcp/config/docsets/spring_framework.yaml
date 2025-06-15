@@ -1,0 +1,16 @@
+name: Spring Framework
+description: Java application framework
+docset_name: Spring_Framework
+docset_path: Spring Framework.docset
+languages:
+  - springframework
+types:
+  - Method
+  - Constructor
+  - Class
+  - Field
+  - Interface
+  - Element
+  - Constant
+  - Package
+  - Exception

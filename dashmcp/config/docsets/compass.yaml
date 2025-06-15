@@ -1,0 +1,11 @@
+name: Compass
+description: CSS authoring framework using Sass
+docset_name: Compass
+docset_path: Compass.docset
+languages:
+  - compass
+types:
+  - Mixin
+  - Variable
+  - Module
+  - func

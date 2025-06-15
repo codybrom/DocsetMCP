@@ -1,0 +1,15 @@
+name: JavaScript
+description: High-level, interpreted programming language
+docset_name: JavaScript
+docset_path: JavaScript.docset
+languages:
+  - javascript
+types:
+  - Property
+  - clm
+  - cl
+  - Guide
+  - Event
+  - Constructor
+  - Keyword
+  - func

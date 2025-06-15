@@ -1,0 +1,14 @@
+name: Sencha Touch
+description: Mobile web application framework
+docset_name: Sencha_Touch
+docset_path: Sencha Touch.docset
+languages:
+  - senchatouch
+types:
+  - clm
+  - Option
+  - Property
+  - cl
+  - event
+  - var
+  - Mixin

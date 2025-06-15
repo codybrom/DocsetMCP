@@ -1,0 +1,11 @@
+name: Bootstrap 4
+description: Front-end framework for faster and easier web development
+docset_name: Bootstrap_4
+docset_path: Bootstrap 4.docset
+languages:
+  - css
+  - javascript
+types:
+  - Section
+  - Guide
+framework_path_extract: None

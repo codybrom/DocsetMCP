@@ -1,0 +1,16 @@
+name: Qt 4
+description: Cross-platform application framework
+docset_name: Qt_4
+docset_path: Qt.docset
+languages:
+  - qt
+types:
+  - Function
+  - Property
+  - cl
+  - Type
+  - Method
+  - Variable
+  - Macro
+  - Module
+  - Namespace

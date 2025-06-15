@@ -1,0 +1,16 @@
+name: sproutcore
+description: JavaScript framework for web applications
+docset_name: sproutcore
+docset_path: sproutcore.docset
+languages:
+  - sproutcore
+types:
+  - Method
+  - Property
+  - Class
+  - Global
+  - Mixin
+  - Protocol
+  - Type
+  - Namespace
+  - Delegate

@@ -1,0 +1,12 @@
+name: Twisted
+description: Event-driven networking engine for Python
+docset_name: Twisted
+docset_path: Twisted.docset
+languages:
+  - python
+types:
+  - Method
+  - Attribute
+  - Class
+  - Function
+  - Module

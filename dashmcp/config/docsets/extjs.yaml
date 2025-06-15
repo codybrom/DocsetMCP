@@ -1,0 +1,15 @@
+name: ExtJS
+description: Ext JS - JavaScript framework for building data-intensive web apps
+docset_name: ExtJS
+docset_path: ExtJS.docset
+languages:
+  - javascript
+types:
+  - Method
+  - Option
+  - Variable
+  - Property
+  - Class
+  - Event
+  - Mixin
+  - Guide

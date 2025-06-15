@@ -1,0 +1,16 @@
+name: SaltStack
+description: Infrastructure automation and management
+docset_name: SaltStack
+docset_path: SaltStack.docset
+languages:
+  - python
+types:
+  - Function
+  - Module
+  - Guide
+  - Option
+  - Method
+  - Section
+  - Attribute
+  - Class
+  - Exception

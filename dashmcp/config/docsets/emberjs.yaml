@@ -1,0 +1,17 @@
+name: EmberJS
+description: Framework for creating ambitious web applications
+docset_name: EmberJS
+docset_path: EmberJS.docset
+languages:
+  - javascript
+types:
+  - Method
+  - Section
+  - Property
+  - Guide
+  - cl
+  - Event
+  - Package
+  - Interface
+  - Module
+  - Function

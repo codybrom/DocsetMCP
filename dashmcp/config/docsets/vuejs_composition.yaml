@@ -1,0 +1,13 @@
+name: VueJS (Composition)
+description: VueJS (Composition) documentation
+docset_name: VueJS
+docset_path: VueJS_(Composition).docset
+languages:
+  - javascript
+types:
+  - Section
+  - Method
+  - Guide
+  - Directive
+  - Component
+  - Attribute

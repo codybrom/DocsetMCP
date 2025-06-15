@@ -1,0 +1,17 @@
+name: Julia
+description: High-level, high-performance language for technical computing
+docset_name: Julia
+docset_path: Julia.docset
+languages:
+  - julia
+types:
+  - Function
+  - Section
+  - Type
+  - Method
+  - Macro
+  - Guide
+  - Constant
+  - Category
+  - Keyword
+  - Module

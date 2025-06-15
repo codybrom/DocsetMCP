@@ -1,0 +1,15 @@
+name: Bash
+description: GNU Bash shell - command language interpreter
+docset_name: Bash
+docset_path: Bash.docset
+languages:
+  - bash
+  - shell
+  - sh
+types:
+  - Variable
+  - Guide
+  - Function
+  - Builtin
+  - Word
+  - Parameter

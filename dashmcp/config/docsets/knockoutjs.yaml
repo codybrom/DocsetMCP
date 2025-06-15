@@ -1,0 +1,9 @@
+name: KnockoutJS
+description: JavaScript library for dynamic UIs with MVVM
+docset_name: KnockoutJS
+docset_path: KnockoutJS.docset
+languages:
+  - javascript
+types:
+  - Guide
+  - Binding

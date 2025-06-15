@@ -1,0 +1,11 @@
+name: Bourbon
+description: Sass mixin library for modern web development
+docset_name: Bourbon
+docset_path: Bourbon.docset
+languages:
+  - sass
+  - scss
+types:
+  - Variable
+  - Mixin
+  - Function

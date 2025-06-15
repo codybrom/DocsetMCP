@@ -1,0 +1,8 @@
+name: Lua 5.2
+description: Lightweight, embeddable scripting language
+docset_name: Lua_5.2
+docset_path: Lua.docset
+languages:
+  - lua
+types:
+  - func

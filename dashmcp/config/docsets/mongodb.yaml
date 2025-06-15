@@ -1,0 +1,15 @@
+name: MongoDB
+description: NoSQL document database
+docset_name: MongoDB
+docset_path: MongoDB.docset
+languages:
+  - go
+types:
+  - Section
+  - Method
+  - Option
+  - Guide
+  - Operator
+  - Command
+  - Type
+  - Variable

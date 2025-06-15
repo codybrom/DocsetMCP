@@ -1,0 +1,19 @@
+name: Dart
+description: Client-optimized language for fast apps on any platform
+docset_name: Dart
+docset_path: Dart.docset
+languages:
+  - dart
+types:
+  - Property
+  - Method
+  - Constant
+  - Class
+  - Constructor
+  - Operator
+  - Extension
+  - Function
+  - Type
+  - Exception
+  - Library
+  - Enum

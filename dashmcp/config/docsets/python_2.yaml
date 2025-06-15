@@ -1,0 +1,21 @@
+name: Python 2
+description: Legacy version of Python programming language
+docset_name: Python_2
+docset_path: Python 2.docset
+languages:
+  - python
+types:
+  - Method
+  - Function
+  - Section
+  - Class
+  - Attribute
+  - Module
+  - Exception
+  - Guide
+  - Constant
+  - Option
+  - Variable
+  - Type
+  - Statement
+  - Macro

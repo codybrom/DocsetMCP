@@ -1,0 +1,16 @@
+name: Matplotlib
+description: Python plotting library
+docset_name: Matplotlib
+docset_path: Matplotlib.docset
+languages:
+  - matplotlib
+types:
+  - Method
+  - Attribute
+  - Class
+  - Sample
+  - Function
+  - Guide
+  - Module
+  - Exception
+  - Variable

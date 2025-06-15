@@ -1,0 +1,10 @@
+name: Redis
+description: In-memory data structure store
+docset_name: Redis
+docset_path: Redis.docset
+languages:
+  - redis
+types:
+  - Section
+  - Guide
+  - Command

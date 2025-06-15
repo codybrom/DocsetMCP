@@ -1,0 +1,11 @@
+name: Bootstrap 2
+description: Front-end framework for faster and easier web development
+docset_name: Bootstrap_2
+docset_path: Bootstrap.docset
+languages:
+  - css
+  - javascript
+types:
+  - Section
+  - Sample
+  - Guide

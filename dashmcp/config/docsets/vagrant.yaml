@@ -1,0 +1,12 @@
+name: Vagrant
+description: Tool for building and managing virtual environments
+docset_name: Vagrant
+docset_path: Vagrant.docset
+languages:
+  - vagrant
+types:
+  - Guide
+  - Setting
+  - Command
+  - Provisioner
+  - Service

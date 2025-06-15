@@ -1,0 +1,10 @@
+name: Sass
+description: CSS extension language
+docset_name: Sass
+docset_path: Sass.docset
+languages:
+  - sass
+types:
+  - Section
+  - Guide
+  - Function

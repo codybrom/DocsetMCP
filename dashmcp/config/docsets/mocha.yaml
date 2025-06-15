@@ -1,0 +1,8 @@
+name: Mocha
+description: JavaScript test framework
+docset_name: Mocha
+docset_path: Mocha.docset
+languages:
+  - mocha
+types:
+  - Guide

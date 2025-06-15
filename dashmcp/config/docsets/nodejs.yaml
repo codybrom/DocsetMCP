@@ -1,0 +1,16 @@
+name: NodeJS
+description: JavaScript runtime built on Chrome's V8 engine
+docset_name: NodeJS
+docset_path: NodeJS.docset
+languages:
+  - javascript
+types:
+  - clm
+  - Guide
+  - instp
+  - Error
+  - cl
+  - Event
+  - Option
+  - Module
+  - Variable

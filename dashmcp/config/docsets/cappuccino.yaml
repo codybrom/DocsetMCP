@@ -1,0 +1,16 @@
+name: Cappuccino
+description: Objective-J web application framework inspired by Cocoa
+docset_name: Cappuccino
+docset_path: Cappuccino.docset
+languages:
+  objj:
+    prefix: CP
+types:
+  - clm
+  - Variable
+  - func
+  - cat
+  - Class
+  - tdef
+  - intf
+  - Macro

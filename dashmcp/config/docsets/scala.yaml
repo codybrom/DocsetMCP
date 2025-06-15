@@ -1,0 +1,17 @@
+name: Scala
+description: Multi-paradigm programming language
+docset_name: Scala
+docset_path: Scala.docset
+languages:
+  - scala
+types:
+  - Function
+  - Class
+  - Constant
+  - Trait
+  - Object
+  - Type
+  - Given
+  - Variable
+  - Package
+  - Enum

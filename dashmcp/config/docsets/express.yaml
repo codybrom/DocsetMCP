@@ -1,0 +1,11 @@
+name: Express
+description: Fast, unopinionated web framework for Node.js
+docset_name: Express
+docset_path: Express.docset
+languages:
+  - javascript
+types:
+  - Method
+  - Property
+  - Guide
+  - Class

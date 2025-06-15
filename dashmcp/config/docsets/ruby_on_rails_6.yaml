@@ -1,0 +1,14 @@
+name: Ruby on Rails 6
+description: Web application framework
+docset_name: Ruby_on_Rails_6
+docset_path: Ruby on Rails.docset
+languages:
+  - ruby
+types:
+  - clm
+  - cl
+  - instm
+  - Module
+  - Attribute
+  - clconst
+  - Guide

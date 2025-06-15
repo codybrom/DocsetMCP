@@ -1,0 +1,8 @@
+name: Vim
+description: Highly configurable text editor
+docset_name: Vim
+docset_path: Vim.docset
+languages:
+  - vim
+types:
+  - func

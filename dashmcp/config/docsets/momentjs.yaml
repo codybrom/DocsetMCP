@@ -1,0 +1,9 @@
+name: MomentJS
+description: JavaScript library for parsing and displaying dates
+docset_name: MomentJS
+docset_path: MomentJS.docset
+languages:
+  - javascript
+types:
+  - Function
+  - Guide

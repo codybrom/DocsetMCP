@@ -1,0 +1,13 @@
+name: Go
+description: Statically typed, compiled programming language by Google
+docset_name: Go
+docset_path: Go.docset
+languages:
+  - go
+types:
+  - Function
+  - Constant
+  - tdef
+  - Variable
+  - Package
+  - Guide

@@ -1,0 +1,9 @@
+name: React
+description: JavaScript library for building user interfaces
+docset_name: React
+docset_path: React.docset
+languages:
+  - react
+types:
+  - Section
+  - Guide

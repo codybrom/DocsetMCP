@@ -1,0 +1,13 @@
+name: OCaml
+description: Industrial-strength functional programming language
+docset_name: OCaml
+docset_path: OCaml.docset
+languages:
+  - ocaml
+types:
+  - Value
+  - Type
+  - Module
+  - Exception
+  - Command
+  - Library

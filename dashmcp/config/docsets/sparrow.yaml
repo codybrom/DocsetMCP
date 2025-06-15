@@ -1,0 +1,15 @@
+name: Sparrow
+description: IOS game framework
+docset_name: Sparrow
+docset_path: Sparrow.docset
+languages:
+  - sparrow
+types:
+  - instm
+  - instp
+  - clm
+  - cl
+  - tdef
+  - cat
+  - intfm
+  - intf

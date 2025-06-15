@@ -1,0 +1,14 @@
+name: Ruby on Rails 5
+description: Web application framework
+docset_name: Ruby_on_Rails_5
+docset_path: Ruby on Rails.docset
+languages:
+  - ruby
+types:
+  - clm
+  - instm
+  - Module
+  - cl
+  - Attribute
+  - clconst
+  - Guide

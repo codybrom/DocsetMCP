@@ -1,0 +1,9 @@
+name: jQuery
+description: Fast, small JavaScript library
+docset_name: jQuery
+docset_path: jQuery.docset
+languages:
+  - jquery
+types:
+  - func
+  - Category

@@ -1,0 +1,14 @@
+name: Flask
+description: Lightweight WSGI web application framework for Python
+docset_name: Flask
+docset_path: Flask.docset
+languages:
+  - rust
+  - javascript
+types:
+  - Method
+  - Attribute
+  - Guide
+  - Function
+  - Class
+  - Module

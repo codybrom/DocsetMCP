@@ -1,0 +1,9 @@
+name: TypeScript
+description: Typed superset of JavaScript
+docset_name: TypeScript
+docset_path: TypeScript.docset
+languages:
+  - javascript
+types:
+  - Section
+  - Guide

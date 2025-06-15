@@ -1,0 +1,9 @@
+name: UnderscoreJS
+description: JavaScript utility library
+docset_name: UnderscoreJS
+docset_path: UnderscoreJS.docset
+languages:
+  - javascript
+types:
+  - func
+  - Guide

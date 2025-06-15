@@ -1,0 +1,9 @@
+name: SVG
+description: Scalable Vector Graphics
+docset_name: SVG
+docset_path: SVG.docset
+languages:
+  - svg
+types:
+  - Attribute
+  - Element

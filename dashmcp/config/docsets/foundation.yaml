@@ -1,0 +1,15 @@
+name: Foundation
+description: Responsive front-end framework
+docset_name: Foundation
+docset_path: Foundation.docset
+languages:
+  - foundation
+types:
+  - Variable
+  - Mixin
+  - Option
+  - Component
+  - Event
+  - Function
+  - Guide
+  - Library

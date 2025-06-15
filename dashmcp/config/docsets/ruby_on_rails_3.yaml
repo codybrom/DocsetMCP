@@ -1,0 +1,14 @@
+name: Ruby on Rails 3
+description: Web application framework
+docset_name: Ruby_on_Rails_3
+docset_path: Ruby on Rails.docset
+languages:
+  - ruby
+types:
+  - clm
+  - instm
+  - cl
+  - Module
+  - Attribute
+  - clconst
+  - Guide

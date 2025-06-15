@@ -1,0 +1,14 @@
+name: Ruby on Rails 4
+description: Web application framework
+docset_name: Ruby_on_Rails_4
+docset_path: Ruby on Rails.docset
+languages:
+  - ruby
+types:
+  - clm
+  - instm
+  - Module
+  - cl
+  - clconst
+  - Attribute
+  - Guide

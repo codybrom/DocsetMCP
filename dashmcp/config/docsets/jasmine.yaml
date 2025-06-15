@@ -1,0 +1,15 @@
+name: Jasmine
+description: Behavior-driven testing framework for JavaScript
+docset_name: Jasmine
+docset_path: Jasmine.docset
+languages:
+  - jasmine
+types:
+  - Method
+  - Member
+  - Type
+  - Interface
+  - Class
+  - Namespace
+  - Constructor
+  - Module

@@ -1,0 +1,13 @@
+name: AppleScript
+description: MacOS scripting language for automating tasks
+docset_name: AppleScript
+docset_path: AppleScript.docset
+languages:
+  - applescript
+  - osascript
+types:
+  - Guide
+  - Command
+  - Class
+  - Operator
+  - Constant

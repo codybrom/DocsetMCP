@@ -1,0 +1,10 @@
+name: Grunt
+description: JavaScript task runner
+docset_name: Grunt
+docset_path: Grunt.docset
+languages:
+  - grunt
+types:
+  - Method
+  - Guide
+  - Module

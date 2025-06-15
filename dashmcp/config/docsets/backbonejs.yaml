@@ -1,0 +1,13 @@
+name: BackboneJS
+description: Lightweight JavaScript framework for structuring web applications
+docset_name: BackboneJS
+docset_path: BackboneJS.docset
+languages:
+  - javascript
+  - js
+  - jsx
+types:
+  - Function
+  - Sample
+  - Guide
+  - Class

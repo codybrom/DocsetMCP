@@ -1,0 +1,13 @@
+name: YUI
+description: Yahoo! User Interface Library
+docset_name: YUI
+docset_path: YUI.docset
+languages:
+  - yui
+types:
+  - clm
+  - Attribute
+  - instp
+  - Event
+  - Module
+  - cl

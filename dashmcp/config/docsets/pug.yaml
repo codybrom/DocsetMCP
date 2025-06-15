@@ -1,0 +1,11 @@
+name: Pug
+description: Robust, elegant templating engine (formerly Jade)
+docset_name: Pug
+docset_path: Pug.docset
+languages:
+  - pug
+types:
+  - Component
+  - Option
+  - Method
+  - Property

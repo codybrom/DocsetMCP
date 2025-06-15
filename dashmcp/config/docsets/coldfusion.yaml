@@ -1,0 +1,9 @@
+name: ColdFusion
+description: Adobe ColdFusion - rapid web application development platform
+docset_name: ColdFusion
+docset_path: ColdFusion.docset
+languages:
+  - coldfusion
+types:
+  - Function
+  - Tag

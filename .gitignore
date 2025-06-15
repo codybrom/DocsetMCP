@@ -1,0 +1,30 @@
+# Virtual environments
+.dashmd_mcp_venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Cache
+.dash_cache/
+
+# Launcher
+dashmd-mcp
+EOF < /dev/null

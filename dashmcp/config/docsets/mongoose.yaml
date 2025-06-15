@@ -1,0 +1,10 @@
+name: Mongoose
+description: MongoDB object modeling for Node.js
+docset_name: Mongoose
+docset_path: Mongoose.docset
+languages:
+  - go
+types:
+  - Method
+  - Guide
+  - Module

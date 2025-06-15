@@ -1,0 +1,103 @@
+{
+    // Python formatting
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "88"
+    ],
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    // YAML formatting
+    "[yaml]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": false // Disable Prettier for YAML since we use yamlfix
+    },
+    // Pre-commit integration
+    "files.associations": {
+        "*.yaml": "yaml",
+        "*.yml": "yaml"
+    },
+    // Run formatters on save via tasks
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.ya?ml$",
+                "cmd": "yamlfix ${file}"
+            }
+        ]
+    },
+    // Python linting
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length=88",
+        "--extend-ignore=E203"
+    ],
+    // Test discovery
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    // Exclude directories
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        ".pytest_cache": true,
+        "*.egg-info": true,
+        ".coverage": true,
+        "htmlcov": true
+    },
+    // Spell checker words
+    "cSpell.words": [
+        "actionscript",
+        "Akka",
+        "applescript",
+        "backbonejs",
+        "brotli",
+        "Codenames",
+        "CUDA",
+        "Docset",
+        "docsets",
+        "dsidx",
+        "dzil",
+        "flake8",
+        "Gitmoji",
+        "Grafx",
+        "Haml",
+        "Jasminej",
+        "Joomla",
+        "Keybaseio",
+        "Laravel",
+        "LLDB",
+        "Magit",
+        "Matplotlib",
+        "Netcat",
+        "Prezto",
+        "pumadev",
+        "pytest",
+        "RBQL",
+        "Sencha",
+        "Siteleaf",
+        "sproutcore",
+        "Susy",
+        "Symfony",
+        "tarix",
+        "Textastic",
+        "Vimdiff",
+        "Visidata",
+        "xdist",
+        "yamlfix",
+        "Zepto",
+        "cheatsheet",
+        "cheatsheets",
+        "fastmcp",
+        "tarindex"
+    ]
+}

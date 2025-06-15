@@ -1,0 +1,11 @@
+name: Processing
+description: Flexible software sketchbook for visual arts
+docset_name: Processing
+docset_path: Processing.docset
+languages:
+  - processing
+types:
+  - func
+  - tdef
+  - cl
+  - Constant

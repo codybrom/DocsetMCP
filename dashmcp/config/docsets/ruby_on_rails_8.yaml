@@ -1,0 +1,14 @@
+name: Ruby on Rails 8
+description: Web application framework
+docset_name: Ruby_on_Rails_8
+docset_path: Ruby on Rails.docset
+languages:
+  - ruby
+types:
+  - clm
+  - instm
+  - cl
+  - Module
+  - Attribute
+  - clconst
+  - Guide

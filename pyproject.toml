@@ -1,0 +1,7 @@
+[tool.yamlfix]
+preserve_quotes = true
+explicit_start = false
+sort_keys = true
+sequence_style = "block_style"
+line_length = 120
+section_whitelines = 0

@@ -1,0 +1,10 @@
+name: HTML
+description: HyperText Markup Language for creating web pages
+docset_name: HTML
+docset_path: HTML.docset
+languages:
+  - ruby
+types:
+  - Attribute
+  - Tag
+  - Guide

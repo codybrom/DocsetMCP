@@ -1,0 +1,8 @@
+name: OpenGL 2
+description: Cross-platform graphics API
+docset_name: OpenGL_2
+docset_path: OpenGL2.docset
+languages:
+  - rust
+types:
+  - func

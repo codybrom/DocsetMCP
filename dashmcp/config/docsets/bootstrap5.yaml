@@ -1,0 +1,11 @@
+name: Bootstrap 5
+description: Front-end framework for faster and easier web development
+docset_name: Bootstrap_5
+docset_path: Bootstrap 5.docset
+languages:
+  - css
+  - javascript
+types:
+  - Section
+  - Guide
+framework_path_extract: None

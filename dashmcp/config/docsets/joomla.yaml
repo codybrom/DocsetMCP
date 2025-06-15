@@ -1,0 +1,14 @@
+name: Joomla
+description: Open source content management system
+docset_name: Joomla
+docset_path: Joomla.docset
+languages:
+  - joomla
+types:
+  - Method
+  - Property
+  - Class
+  - Namespace
+  - Constant
+  - Interface
+  - Trait
