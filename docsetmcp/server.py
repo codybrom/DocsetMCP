@@ -1134,8 +1134,8 @@ except Exception as e:
 @mcp.tool()
 def search_docs(
     query: str,
-    docset: str = "apple_api_reference",
-    language: str = "swift",
+    docset: str,
+    language: str | None = None,
     max_results: int = 3,
 ) -> str:
     """
@@ -1143,8 +1143,8 @@ def search_docs(
 
     Args:
         query: The API/function name to search for (e.g., 'AppIntent', 'fs.readFile', 'echo')
-        docset: Docset to search in ('apple_api_reference', 'nodejs', 'bash', etc.)
-        language: Programming language variant (varies by docset)
+        docset: Docset to search in (e.g., 'apple_api_reference', 'nodejs', 'bash')
+        language: Programming language variant (optional, varies by docset)
         max_results: Maximum number of results to return (1-10)
 
     Returns:
@@ -1158,6 +1158,15 @@ def search_docs(
 
     if not 1 <= max_results <= 10:
         return "Error: max_results must be between 1 and 10"
+
+    # Use docset-specific default language if none provided
+    if language is None:
+        # Get the first configured language as default
+        config = extractor.config
+        if "languages" in config and config["languages"]:
+            language = next(iter(config["languages"]))
+        else:
+            language = "swift"  # Fallback for compatibility
 
     return extractor.search(query, language, max_results)
 
@@ -1187,14 +1196,12 @@ def list_available_docsets() -> str:
 
 
 @mcp.tool()
-def list_frameworks(
-    docset: str = "apple_api_reference", filter: str | None = None
-) -> str:
+def list_frameworks(docset: str, filter: str | None = None) -> str:
     """
     List available frameworks/types in a specific docset.
 
     Args:
-        docset: Docset to list from ('apple_api_reference', 'nodejs', 'bash', etc.)
+        docset: Docset to list from (e.g., 'nodejs', 'python_3', 'bash')
         filter: Optional filter for framework/type names
 
     Returns:

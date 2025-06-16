@@ -12,7 +12,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="docsetmcp",
-    version="0.2.1",
+    version="0.2.2",
     author="Cody Bromley",
     author_email="dev@codybrom.com",
     description="Search local documentation from Dash through MCP",

@@ -73,7 +73,7 @@ Add to your MCP config and restart your MCP client. Then try asking something li
 DocsetMCP supports 165+ docsets including:
 
 <details>
-<summary>**Popular Languages**</summary>
+<summary><b>Popular Languages</b></summary>
 
 - Python (2 & 3)
 - JavaScript / TypeScript
@@ -90,7 +90,7 @@ DocsetMCP supports 165+ docsets including:
 </details>
 
 <details>
-<summary>**Web Frameworks**</summary>
+<summary><b>Web Frameworks</b></summary>
 
 - React / Angular / Vue
 - Node.js / Express
@@ -103,7 +103,7 @@ DocsetMCP supports 165+ docsets including:
 </details>
 
 <details>
-<summary>**Developer Tools**</summary>
+<summary><b>Developer Tools</b></summary>
 
 - Git (cheatsheet)
 - Docker (cheatsheet)
@@ -130,7 +130,7 @@ Use `list_available_docsets` to see all docsets installed on your system.
 Choose your MCP client below for specific setup instructions:
 
 <details>
-<summary>**🤖 Claude Desktop**</summary>
+<summary><b>🤖 Claude Desktop</b></summary>
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
@@ -148,7 +148,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 </details>
 
 <details>
-<summary>**⌨️ Claude Code CLI**</summary>
+<summary><b>⌨️ Claude Code CLI</b></summary>
 
 ```bash
 # For current project
@@ -161,7 +161,7 @@ claude mcp add --scope user docsetmcp "uvx docsetmcp"
 </details>
 
 <details>
-<summary>**📝 Cursor, VS Code, Windsurf and other MCP-compatible clients**</summary>
+<summary><b>📝 Cursor, VS Code, Windsurf and other MCP-compatible clients</b></summary>
 
 Add to your MCP configuration (Cursor: `.mcp/mcp.json` in your project root:
 
@@ -295,8 +295,8 @@ Search and extract documentation from any docset.
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
 | `query` | string | API/function name to search | *required* |
-| `docset` | string | Target docset (e.g., 'nodejs', 'python_3') | 'apple_api_reference' |
-| `language` | string | Programming language filter | - |
+| `docset` | string | Target docset (e.g., 'nodejs', 'python_3') | *required* |
+| `language` | string | Programming language filter | docset default |
 | `max_results` | int | Number of results (1-10) | 3 |
 
 ### 📋 `search_cheatsheet`
@@ -324,13 +324,13 @@ List frameworks/types within a specific docset.
 
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
-| `docset` | string | Target docset | 'apple_api_reference' |
+| `docset` | string | Target docset | *required* |
 | `filter` | string | Filter framework names | - |
 
 ## Troubleshooting
 
 <details>
-<summary>**❌ "Docset not found" error**</summary>
+<summary><b>❌ "Docset not found" error</b></summary>
 
 This means the docset isn't installed in Dash. To fix:
 
@@ -342,7 +342,7 @@ This means the docset isn't installed in Dash. To fix:
 </details>
 
 <details>
-<summary>**🔌 MCP connection failed**</summary>
+<summary><b>🔌 MCP connection failed</b></summary>
 
 1. **Check installation**: Run `pip show docsetmcp` to verify installation
 2. **Test manually**: Run `uvx docsetmcp` in terminal - you should see MCP output
@@ -354,7 +354,7 @@ This means the docset isn't installed in Dash. To fix:
 </details>
 
 <details>
-<summary>**📭 No results found**</summary>
+<summary><b>📭 No results found</b></summary>
 
 - The content might not be in your local Dash cache
 - Try searching with different terms or partial matches
@@ -364,7 +364,7 @@ This means the docset isn't installed in Dash. To fix:
 </details>
 
 <details>
-<summary>**🐛 Other issues**</summary>
+<summary><b>🐛 Other issues</b></summary>
 
 1. **Python version**: Ensure you have Python 3.10 or higher
 2. **UV not found**: Install UV package manager from <https://docs.astral.sh/uv/>

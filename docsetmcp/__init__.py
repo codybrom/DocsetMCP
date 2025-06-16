@@ -1,5 +1,5 @@
 """DocsetMCP - Extract documentation from Dash docsets as Markdown through MCP"""
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 __author__ = "Cody Bromley"
 __email__ = "dev@codybrom.com"
