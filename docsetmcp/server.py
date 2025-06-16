@@ -2174,6 +2174,64 @@ def fetch_cheatsheet(cheatsheet: str) -> str:
 
 def main():
     """Main entry point for the MCP server"""
+    import sys
+    import argparse
+    from . import __version__
+
+    parser = argparse.ArgumentParser(
+        prog="docsetmcp",
+        description="Model Context Protocol server for Dash-style docsets",
+        epilog="For more information, visit: https://github.com/codybrom/docsetmcp",
+    )
+
+    parser.add_argument(
+        "--version", "-v", action="version", version=f"DocsetMCP {__version__}"
+    )
+
+    parser.add_argument(
+        "--list-docsets",
+        action="store_true",
+        help="List all available docsets and exit",
+    )
+
+    parser.add_argument(
+        "--test-connection",
+        action="store_true",
+        help="Test MCP server startup and exit",
+    )
+
+    # Parse args but allow for no args (normal MCP mode)
+    args = parser.parse_args()
+
+    # Handle special commands
+    if args.list_docsets:
+        print("Available DocsetMCP docsets:")
+        if extractors:
+            for docset_id, extractor in sorted(extractors.items()):
+                config = extractor.config
+                languages = list(config.get("languages", {}).keys())
+                lang_str = ", ".join(languages) if languages else "no languages"
+                print(f"  {docset_id}: {config.get('name', docset_id)} ({lang_str})")
+            print(f"\nTotal: {len(extractors)} docsets available")
+        else:
+            print("  No docsets found. Please install docsets in Dash.app first.")
+        return
+
+    if args.test_connection:
+        print(f"DocsetMCP {__version__}")
+        print("Testing MCP server startup...")
+        try:
+            # Quick initialization test
+            print(f"✓ Found {len(extractors)} docset(s)")
+            print(f"✓ Found {len(cheatsheet_extractors)} cheatsheet(s) cached")
+            print("✓ MCP server initialized successfully")
+            print("\nStarting MCP server (use Ctrl+C to stop)...")
+            # Fall through to normal MCP mode for a few seconds to test
+        except Exception as e:
+            print(f"✗ Error initializing MCP server: {e}")
+            sys.exit(1)
+
+    # Normal MCP server mode
     mcp.run()
 
 

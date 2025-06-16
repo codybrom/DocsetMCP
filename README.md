@@ -295,7 +295,7 @@ DocsetMCP is designed for **name-based searches**, not keyword searching. Follow
 "List all available programming languages"
 
 # Find docsets for your language
-"Show me all Python docsets" 
+"Show me all Python docsets"
 
 # See what types are available in a docset
 "List all types in the apple_api_reference docset for Swift"

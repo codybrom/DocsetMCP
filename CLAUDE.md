@@ -182,7 +182,7 @@ Apple API documentation has been optimized for intuitive searching:
 4. **Container Type Guidance**: Framework, class, and module entries automatically include notes like:
 
    ```md
-   **Note:** The CarPlay framework contains 42 additional members not shown. 
+   **Note:** The CarPlay framework contains 42 additional members not shown.
    Use `search_docs('CarPlay', language='swift', max_results=50)` to see all CarPlay members.
    ```
 
