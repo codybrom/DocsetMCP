@@ -116,3 +116,4 @@ class DocsetInfo(TypedDict):
     docset: str
     name: str
     languages: list[str]
+    description: str | None

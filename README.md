@@ -51,10 +51,11 @@ Add to your MCP config and restart your MCP client. Then try asking something li
 
 - **Multi-Docset Support**: Search across 165+ supported docsets including Apple, NodeJS, Python, and more
 - **Language Filtering**: Target specific programming languages within docsets
-- **Smart Extraction**: Handles both Apple's modern cache format and traditional tarix archives
-- **Type Prioritization**: Results sorted by relevance (Protocol > Class > Function > etc.)
+- **Name-Based Search**: Only returns entries where search terms match item names for precise results
+- **Smart Ranking**: Results ranked by match type (exact > prefix > substring) and dynamic type ordering
+- **Container Guidance**: Framework and class entries show drilldown notes for exploring members
 
-### Cheatsheet Access  
+### Cheatsheet Access
 
 - **Quick Reference**: Instant access to Git, Vim, Docker, and 40+ other cheatsheets
 - **Fuzzy Matching**: Find cheatsheets even with partial names
@@ -67,6 +68,7 @@ Add to your MCP config and restart your MCP client. Then try asking something li
 - **Direct Database Access**: No intermediate servers or APIs
 - **Universal**: Works with Claude Desktop, Cursor, VS Code, and any MCP-compatible client
 - **Framework Discovery**: List all available frameworks/types in any docset
+- **Container Guidance**: Automatic drilldown notes for frameworks and classes with members
 
 ## 📦 Supported Docsets
 
@@ -237,6 +239,8 @@ Once configured, you can ask your AI assistant to search documentation naturally
 ```text
 "Search for URLSession documentation"
 "Show me how to use AppIntent in SwiftUI"
+"Find CarPlay framework documentation"  # Returns framework + related entries with drilldown notes
+"Search for CPListTemplate class"       # Returns specific CarPlay class
 "Find NSPredicate examples"
 ```
 
@@ -270,6 +274,9 @@ Once configured, you can ask your AI assistant to search documentation naturally
 # Search specific docset with language filter
 "Use search_docs for 'URLSession' in the apple_api_reference docset with Swift language"
 
+# Explore framework members using drilldown guidance
+"Search for 'SwiftData' then follow the drilldown note to see all members"
+
 # List all available tools
 "What frameworks are available in the nodejs docset?"
 
@@ -277,16 +284,58 @@ Once configured, you can ask your AI assistant to search documentation naturally
 "Show all categories in the vim cheatsheet"
 ```
 
+## Discovery Workflow
+
+DocsetMCP is designed for **name-based searches**, not keyword searching. Follow this workflow:
+
+### 1. **Start with Discovery Tools**
+
+```text
+# Find what languages are available
+"List all available programming languages"
+
+# Find docsets for your language
+"Show me all Python docsets" 
+
+# See what types are available in a docset
+"List all types in the apple_api_reference docset for Swift"
+
+# Browse entries by type with letter filters
+"Show me all Classes starting with 'UI' in apple_api_reference for Swift"
+```
+
+### 2. **Then Search by Exact Names**
+
+```text
+# Once you know exact names, search for them
+"Search for UIViewController in apple_api_reference with Swift"
+"Find readFile documentation in nodejs docset"
+"Show me the CarPlay framework documentation"
+```
+
+### 3. **Use Drilldown Notes**
+
+When you find container types (frameworks, classes), follow the drilldown guidance:
+
+```text
+# Container entry will show: "contains 42 additional members - use search_docs('ContainerName', max_results=50)"
+"Search for SwiftData in apple_api_reference with max_results=50"
+```
+
 ## How It Works
 
 1. **Multi-Format Support**: Handles both Apple cache format and tarix compression
 2. **Direct Database Access**: Queries Dash's SQLite databases for fast lookups
-3. **Smart Extraction**: Decompresses Apple's DocC JSON or extracts HTML from tarix archives
-4. **Markdown Formatting**: Converts documentation to readable Markdown
+3. **Name-Based Matching**: Only returns entries where search terms match item names (no false positives)
+4. **Smart Ranking**: Prioritizes exact matches, then prefix matches, then substring matches
+5. **Dynamic Type Ordering**: Uses docset configuration files for intelligent result prioritization
+6. **Container Detection**: Automatically detects frameworks/classes with members and provides exploration guidance
+7. **Smart Extraction**: Decompresses Apple's DocC JSON or extracts HTML from tarix archives
+8. **Markdown Formatting**: Converts documentation to readable Markdown
 
 ## Available Tools
 
-DocsetMCP provides five powerful tools for accessing your documentation:
+DocsetMCP provides eleven powerful tools for accessing your documentation:
 
 ### 🔍 `search_docs`
 
@@ -294,7 +343,7 @@ Search and extract documentation from any docset.
 
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
-| `query` | string | API/function name to search | *required* |
+| `query` | string | **Exact name** to search (not keywords) | *required* |
 | `docset` | string | Target docset (e.g., 'nodejs', 'python_3') | *required* |
 | `language` | string | Programming language filter | docset default |
 | `max_results` | int | Number of results (1-10) | 3 |
@@ -326,6 +375,55 @@ List frameworks/types within a specific docset.
 |-----------|------|-------------|---------|
 | `docset` | string | Target docset | *required* |
 | `filter` | string | Filter framework names | - |
+
+### 🌍 `list_languages`
+
+Discover all programming languages with available documentation.
+
+### 📖 `list_docsets_by_language`
+
+Find all docsets that support a specific programming language.
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `language` | string | Programming language | *required* |
+
+### 🏷️ `list_types`
+
+List all available types (Class, Protocol, Function, etc.) in a docset/language.
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `docset` | string | Target docset | *required* |
+| `language` | string | Programming language filter | - |
+
+### 📋 `list_entries`
+
+List entries filtered by type and optional name prefix.
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `docset` | string | Target docset | *required* |
+| `type_name` | string | Type to filter by (e.g., 'Class', 'Protocol') | *required* |
+| `language` | string | Programming language filter | - |
+| `name_filter` | string | Filter entries by name prefix | - |
+| `max_results` | int | Number of results (1-100) | 20 |
+
+### 📂 `list_cheatsheet_categories`
+
+List all categories within a specific cheatsheet.
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `cheatsheet` | string | Cheatsheet name | *required* |
+
+### 📄 `fetch_cheatsheet`
+
+Fetch entire cheatsheet content (recommended for comprehensive access).
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `cheatsheet` | string | Cheatsheet name | *required* |
 
 ## Troubleshooting
 

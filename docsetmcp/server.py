@@ -10,6 +10,7 @@ import hashlib
 import base64
 import tarfile
 from pathlib import Path
+from typing import Union, TypedDict, Optional
 
 # MCP SDK imports
 from mcp.server.fastmcp import FastMCP
@@ -21,6 +22,11 @@ from .types import (
     ProcessedDocsetConfig,
     DocsetInfo,
 )
+
+
+class MatchedDocsetInfo(TypedDict):
+    config: ProcessedDocsetConfig
+    matched_lang: Optional[str]
 
 
 # Create MCP server
@@ -67,6 +73,33 @@ class DashExtractor:
                 "Please download it in Dash.app first"
             )
 
+    def _normalize_query(self, query: str) -> list[str]:
+        """Normalize query for better matching"""
+        # Remove extra spaces and convert to consistent format
+        normalized = " ".join(query.split())
+        # Also create a no-space version for cases like "App Intent" -> "AppIntent"
+        no_spaces = normalized.replace(" ", "")
+        # Return unique variations
+        variations = [query]
+        if normalized != query:
+            variations.append(normalized)
+        if no_spaces != query and no_spaces != normalized:
+            variations.append(no_spaces)
+        return variations
+
+    def _get_type_order_clause(self) -> str:
+        """Generate SQL CASE clause for type ordering based on config"""
+        if "types" not in self.config or not self.config["types"]:
+            return "0"  # No ordering if types not configured
+
+        case_parts = ["CASE type"]
+        # types is a dict mapping type_name -> priority_index
+        for type_name, priority in self.config["types"].items():
+            case_parts.append(f"    WHEN '{type_name}' THEN {priority}")
+        case_parts.append(f"    ELSE {len(self.config['types'])}")
+        case_parts.append("END")
+        return "\n".join(case_parts)
+
     def search(self, query: str, language: str = "swift", max_results: int = 3) -> str:
         """Search for Apple API documentation"""
         results: list[str] = []
@@ -82,54 +115,207 @@ class DashExtractor:
         lang_config = self.config["languages"][language]
         lang_filter = lang_config["filter"]
 
-        # Exact match first
-        cursor.execute(
-            """
-            SELECT name, type, path
-            FROM searchIndex
-            WHERE name = ? AND path LIKE ?
-            ORDER BY
-                CASE type
-                    WHEN 'Protocol' THEN 0
-                    WHEN 'Class' THEN 1
-                    WHEN 'Struct' THEN 2
-                    ELSE 3
-                END
-            LIMIT ?
-        """,
-            (query, f"%{lang_filter}%", max_results),
-        )
+        db_results = []
+        query_variations = self._normalize_query(query)
 
-        db_results = cursor.fetchall()
+        # Get dynamic type ordering
+        type_order = self._get_type_order_clause()
 
-        if not db_results:
-            # Try partial match
+        # Get top-level types from configuration
+        if "types" in self.config and self.config["types"]:
+            # Sort types by their priority value and take the first few
+            sorted_types = sorted(self.config["types"].items(), key=lambda x: x[1])
+            top_types = [type_name for type_name, _ in sorted_types[:5]]
+        else:
+            # If no types configured, we can't filter by type
+            top_types = []
+
+        type_list = ", ".join(f"'{t}'" for t in top_types) if top_types else "''"
+
+        # Collect all results, not just from first successful query
+        all_results: list[tuple[str, str, str]] = []
+        seen_entries: set[tuple[str, str]] = (
+            set()
+        )  # Track (name, type) to avoid duplicates
+
+        # Try exact match with all query variations (case-insensitive)
+        for q in query_variations:
             cursor.execute(
-                """
+                f"""
                 SELECT name, type, path
                 FROM searchIndex
-                WHERE name LIKE ? AND path LIKE ?
-                ORDER BY LENGTH(name)
+                WHERE name = ? COLLATE NOCASE AND path LIKE ?
+                ORDER BY {type_order}
                 LIMIT ?
             """,
-                (f"%{query}%", f"%{lang_filter}%", max_results),
+                (q, f"%{lang_filter}%", max_results),
             )
-            db_results = cursor.fetchall()
+            for row in cursor.fetchall():
+                key = (row[0], row[1])
+                if key not in seen_entries:
+                    all_results.append(row)
+                    seen_entries.add(key)
+            if len(all_results) >= max_results:
+                break
+
+        # If we need more results, try framework-level entries without language filter
+        if len(all_results) < max_results:
+            for q in query_variations:
+                cursor.execute(
+                    f"""
+                    SELECT name, type, path
+                    FROM searchIndex
+                    WHERE name = ? COLLATE NOCASE
+                    AND type IN ({type_list})
+                    AND (path LIKE '%/documentation/%' OR path LIKE '%request_key=%')
+                    ORDER BY {type_order}
+                    LIMIT ?
+                """,
+                    (q, max_results - len(all_results)),
+                )
+                for row in cursor.fetchall():
+                    key = (row[0], row[1])
+                    if key not in seen_entries:
+                        all_results.append(row)
+                        seen_entries.add(key)
+                if len(all_results) >= max_results:
+                    break
+
+        # Check if we found an exact match in the results
+        found_exact_match: bool = False
+        exact_match_name: str | None = None
+        exact_match_path: str | None = None
+        exact_match_type: str | None = None
+
+        for row in all_results:
+            if len(row) >= 3 and row[0].lower() == query.lower():
+                found_exact_match = True
+                exact_match_name = row[0]
+                exact_match_type = row[1]
+                exact_match_path = row[2]
+                break
+
+        # Track additional members count
+        additional_members = 0
+
+        # Count total members for exact matches to show in the note
+        if found_exact_match and exact_match_name and exact_match_path:
+            # Extract the documentation path pattern
+            doc_path_pattern = ""
+            if "/documentation/" in exact_match_path:
+                doc_path = (
+                    exact_match_path.split("/documentation/")[1]
+                    .split("?")[0]
+                    .split("#")[0]
+                )
+                doc_path_pattern = f"%/documentation/{doc_path}/%"
+
+            if doc_path_pattern:
+                # Count total members for the note (but don't include them in results)
+                cursor.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM searchIndex
+                    WHERE path LIKE ?
+                    AND path LIKE ?
+                    AND name != ?
+                """,
+                    (doc_path_pattern, f"%{lang_filter}%", exact_match_name),
+                )
+                total_count = cursor.fetchone()
+                if total_count:
+                    additional_members = total_count[0]
+
+        # If we still need more results, try broader search
+        if len(all_results) < max_results:
+            cursor.execute(
+                f"""
+                SELECT name, type, path,
+                    CASE
+                        WHEN name = ? COLLATE NOCASE THEN 0
+                        WHEN type IN ({type_list}) AND name = ? COLLATE NOCASE THEN 1
+                        WHEN name LIKE ? COLLATE NOCASE THEN 2
+                        WHEN type IN ({type_list}) AND name LIKE ? COLLATE NOCASE THEN 3
+                        ELSE 4
+                    END as rank
+                FROM searchIndex
+                WHERE name LIKE ? COLLATE NOCASE
+                AND (
+                    (path LIKE ? AND path LIKE ?)  -- Has language filter
+                    OR (type IN ({type_list}) AND (path LIKE '%/documentation/%' OR path LIKE '%request_key=%'))  -- Or is framework without language
+                )
+                ORDER BY rank, {type_order}, LENGTH(name)
+                LIMIT ?
+            """,
+                (
+                    query,
+                    query,
+                    f"{query}%",
+                    f"{query}%",
+                    f"%{query}%",
+                    f"%{lang_filter}%",
+                    f"%{lang_filter}%",
+                    max_results * 2,
+                ),
+            )
+            for row in cursor.fetchall():
+                if len(all_results) >= max_results:
+                    break
+                key = (row[0], row[1])
+                if key not in seen_entries:
+                    all_results.append(row)
+                    seen_entries.add(key)
 
         conn.close()
+
+        # Use all_results instead of db_results
+        db_results: list[tuple[str, str, str]] = all_results[:max_results]
 
         if not db_results:
             return f"No matches found for '{query}' in {language} documentation"
 
         # Extract documentation for each result
-        for name, doc_type, path in db_results[:max_results]:
+        results: list[str] = []
+        for row in db_results[:max_results]:
+            # Handle both 3-column and 4-column results (with or without rank)
+            if len(row) == 4:
+                name: str = str(row[0])
+                doc_type: str = str(row[1])
+                path: str = str(row[2])
+                # Ignore rank column (row[3])
+            else:
+                name: str = str(row[0])
+                doc_type: str = str(row[1])
+                path: str = str(row[2])
             if self.config["format"] == "apple":
                 if "request_key=" in path:
-                    request_key = path.split("request_key=")[1].split("#")[0]
-                    doc = self._extract_by_request_key(request_key, language)
+                    request_key: str = path.split("request_key=")[1].split("#")[0]
+                    # Remove any language parameter from request_key
+                    if "&" in request_key:
+                        request_key = request_key.split("&")[0]
+
+                    # If path contains language parameter, use that instead
+                    path_language: str = language
+                    if "&language=" in path:
+                        path_language = (
+                            path.split("&language=")[1].split("&")[0].split("#")[0]
+                        )
+
+                    doc = self._extract_by_request_key(request_key, path_language)
 
                     if doc:
                         markdown = self._format_as_markdown(doc, name, doc_type)
+
+                        # Add member note if this is the exact match and has members
+                        if (
+                            found_exact_match
+                            and name == exact_match_name
+                            and doc_type == exact_match_type
+                            and additional_members > 0
+                        ):
+                            type_note = f"\n\n**Note:** The {exact_match_name} {doc_type.lower()} contains {additional_members} additional members not shown. Use `search_docs('{exact_match_name}', language='{language}', max_results=50)` to see all {exact_match_name} members."
+                            markdown += type_note
+
                         results.append(markdown)
             elif self.config["format"] == "tarix":
                 # Extract HTML content from tarix archive
@@ -138,12 +324,102 @@ class DashExtractor:
                     markdown = self._format_html_as_markdown(
                         html_content, name, doc_type, path
                     )
+
+                    # Add member note if this is the exact match and has members
+                    if (
+                        found_exact_match
+                        and name == exact_match_name
+                        and doc_type == exact_match_type
+                        and additional_members > 0
+                    ):
+                        type_note = f"\n\n**Note:** The {exact_match_name} {doc_type.lower()} contains {additional_members} additional members not shown. Use `search_docs('{exact_match_name}', language='{language}', max_results=50)` to see all {exact_match_name} members."
+                        markdown += type_note
+
                     results.append(markdown)
 
-        if not results:
-            return f"Found entries for '{query}' but couldn't extract documentation. The content may not be in the offline cache."
+        # Handle different result counts appropriately
+        if results:
+            if len(results) == 1:
+                # Single result: return full content
+                return results[0]
+            elif 2 <= len(results) <= 5:
+                # 2-5 results: return summaries with option to search individually
+                summaries: list[str] = []
+                for i, full_content in enumerate(results, 1):
+                    lines = full_content.split("\n")
+                    # Get title and key info
+                    title = lines[0] if lines else f"Result {i}"
+                    summary_lines = [f"{i}. {title}"]
 
-        return "\n\n---\n\n".join(results)
+                    # Add type and framework info
+                    for line in lines[1:10]:
+                        if line.startswith("**Type:**") or line.startswith(
+                            "**Framework:**"
+                        ):
+                            summary_lines.append(f"   {line}")
+
+                    # Add first line of summary if available
+                    for j, line in enumerate(lines):
+                        if line == "## Summary" and j + 2 < len(lines):
+                            summary_text = lines[j + 2]
+                            if len(summary_text) > 100:
+                                summary_text = summary_text[:100] + "..."
+                            summary_lines.append(f"   {summary_text}")
+                            break
+
+                    summaries.append("\n".join(summary_lines))
+
+                header = f"Found {len(results)} results for '{query}':\n\n"
+                footer = (
+                    "\n\nSearch for each item individually to see full documentation."
+                )
+                return header + "\n\n".join(summaries) + footer
+            elif len(results) <= 100:
+                # 6-100 results: return full content with separators
+                return "\n\n---\n\n".join(results)
+            else:
+                # More than 100: show count and suggest refinement
+                # In future, could implement pagination here
+                entry_list: list[str] = []
+                for full_content in results[:100]:
+                    lines = full_content.split("\n")
+                    title = lines[0].replace("# ", "") if lines else "Unknown"
+                    doc_type = "Unknown"
+                    framework = ""
+                    for line in lines[1:5]:
+                        if line.startswith("**Type:**"):
+                            doc_type = line.replace("**Type:** ", "")
+                        elif line.startswith("**Framework:**"):
+                            framework = f" - {line.replace('**Framework:** ', '')}"
+                    entry_list.append(f"- {title} ({doc_type}{framework})")
+
+                header = f"Found {len(results)} results for '{query}' (showing first 100):\n\n"
+                footer = f"\n\nToo many results ({len(results)}). Consider refining your search or using list_entries() with filters."
+                return header + "\n".join(entry_list) + footer
+
+        # No results extracted
+        if not db_results:
+            return f"No matches found for '{query}' in {language} documentation"
+
+        # Found entries but couldn't extract
+        entries_info: list[str] = []
+        for row in db_results[:10]:  # Show up to 10 entries found
+            if len(row) == 4:
+                name: str = str(row[0])
+                doc_type: str = str(row[1])
+                # path not needed for this output
+            else:
+                name: str = str(row[0])
+                doc_type: str = str(row[1])
+                # path not needed for this output
+            entries_info.append(f"- {name} ({doc_type})")
+
+        return f"""Found entries for '{query}' but couldn't extract documentation. The content may not be in the offline cache.
+
+Found but couldn't extract:
+{chr(10).join(entries_info)}
+
+Try opening Dash and ensuring the '{self.config['name']}' docset is fully downloaded."""
 
     def list_frameworks(self, filter_text: str | None = None) -> str:
         """List available frameworks/modules"""
@@ -872,7 +1148,7 @@ class CheatsheetExtractor:
 
         return "\n".join(lines)
 
-    def _extract_entry_content(self, path: str, name: str) -> str | None:
+    def _extract_entry_content(self, _path: str, name: str) -> str | None:
         """Extract entry content from HTML"""
         # For cheatsheets, the path is usually index.html with anchors
         html_path = self.documents_path / "index.html"
@@ -1139,16 +1415,34 @@ def search_docs(
     max_results: int = 3,
 ) -> str:
     """
-    Search and extract documentation from Dash docsets as Markdown.
+    Search and extract documentation from Dash docsets by EXACT NAME MATCHING.
+
+    IMPORTANT: This tool searches for EXACT NAMES of documentation entries, NOT keyword search.
+    Only use this when you know the specific name of a class, function, framework, or API.
+    For discovery, use list_types and list_entries tools first.
+
+    Search behavior:
+    - Exact matches first (e.g., 'CarPlay' → CarPlay framework)
+    - Prefix matches second (e.g., 'CarPlay' → 'carPlaySetting')
+    - Substring matches last (e.g., 'CarPlay' → 'allowInCarPlay')
 
     Args:
-        query: The API/function name to search for (e.g., 'AppIntent', 'fs.readFile', 'echo')
+        query: EXACT NAME of the documentation entry to find
+               Examples: 'CarPlay', 'UIViewController', 'readFile', 'ModelContext'
+               NOT keywords like 'file handling' or 'image processing'
         docset: Docset to search in (e.g., 'apple_api_reference', 'nodejs', 'bash')
         language: Programming language variant (optional, varies by docset)
-        max_results: Maximum number of results to return (1-10)
+                  For Apple docs: 'swift' or 'objc'
+        max_results: Maximum number of results to return (1-10, default: 3)
+
+    For discovery/exploration:
+    - Use list_types(docset, language) to see available types (Class, Protocol, etc.)
+    - Use list_entries(docset, type_name, language, name_filter) to browse entries by type
+    - Use list_frameworks(docset, filter) to find frameworks containing keywords
 
     Returns:
-        Formatted Markdown documentation
+        Formatted Markdown documentation with exact matches prioritized.
+        Container types (frameworks, classes) include drilldown notes for exploring members.
     """
     if docset not in extractors:
         available = list(extractors.keys())
@@ -1174,23 +1468,54 @@ def search_docs(
 @mcp.tool()
 def list_available_docsets() -> str:
     """
-    List all available Dash docsets that can be searched.
+    List all available docsets with detailed information for easy querying.
+
+    This tool provides a comprehensive list of all installed docsets including:
+    - Docset identifier (use this for the 'docset' parameter)
+    - Full name and description
+    - Supported languages
+    - Example query command
 
     Returns:
-        List of available docsets with their names
+        Formatted list of available docsets with usage examples
     """
     if not extractors:
         return (
             "No docsets are currently available. Please check your Dash installation."
         )
 
-    lines = ["Available docsets:"]
-    for docset_type, extractor in extractors.items():
+    lines = ["# Available Dash Docsets\n"]
+    lines.append("Use these docset identifiers with the `search_docs` tool:\n")
+
+    for docset_id, extractor in sorted(extractors.items()):
         config = extractor.config
-        languages = list(config["languages"].keys())
-        lines.append(
-            f"- **{docset_type}**: {config['name']} (languages: {', '.join(languages)})"
+        languages = list(config.get("languages", {}).keys())
+        lang_str = (
+            ", ".join(f"`{lang}`" for lang in languages)
+            if languages
+            else "no languages"
         )
+
+        lines.append(f"## {config.get('name', docset_id)}")
+
+        if "description" in config:
+            lines.append(f"*{config['description']}*\n")
+
+        lines.append(f"- **Docset ID:** `{docset_id}`")
+        lines.append(f"- **Languages:** {lang_str}")
+
+        # Add example query
+        default_lang = languages[0] if languages else None
+        if default_lang:
+            lines.append(
+                f'- **Example:** `search_docs("YourQuery", docset="{docset_id}", language="{default_lang}")`'
+            )
+        else:
+            lines.append(
+                f'- **Example:** `search_docs("YourQuery", docset="{docset_id}")`'
+            )
+
+        lines.append("")  # Empty line between docsets
 
     return "\n".join(lines)
 
@@ -1217,13 +1542,13 @@ def list_frameworks(docset: str, filter: str | None = None) -> str:
 @mcp.tool()
 def list_languages() -> str:
     """
-    List all programming languages that have available documentation docsets.
+    List all programming languages with available documentation and descriptions.
 
-    This tool helps discover what languages are supported across all installed docsets,
-    making it easy to find relevant documentation for your programming needs.
+    This tool provides a comprehensive overview of all supported languages,
+    their associated docsets, and descriptions to help you find the right documentation.
 
     Returns:
-        List of languages with their associated docsets
+        Detailed list of languages with docsets, descriptions, and usage examples
     """
     if not extractors:
         return (
@@ -1247,6 +1572,7 @@ def list_languages() -> str:
                     "docset": docset_type,
                     "name": config["name"],
                     "languages": list(config["languages"].keys()),
+                    "description": config.get("description"),
                 }
             )
         else:
@@ -1295,28 +1621,61 @@ def list_languages() -> str:
                         if "languages" in config
                         else []
                     ),
+                    "description": config.get("description"),
                 }
             )
 
     # Format output
-    lines = ["# Available Languages and Their Docsets\n"]
+    lines = ["# Available Languages and Their Documentation\n"]
+    lines.append(
+        "Explore documentation by language, then drill down into specific docsets and types.\n"
+    )
 
     for lang in sorted(language_map.keys()):
         docsets = language_map[lang]
         lines.append(f"## {lang}")
+        lines.append(f"*{len(docsets)} docset(s) available*\n")
 
         for ds in docsets:
-            lang_variants = ds["languages"]
-            if lang_variants:
-                variants_str = f" (variants: {', '.join(lang_variants)})"
-            else:
-                variants_str = ""
-            lines.append(f"- **{ds['docset']}**: {ds['name']}{variants_str}")
+            lines.append(f"### {ds['name']}")
 
-        lines.append("")
+            # Add description if available
+            if ds.get("description"):
+                lines.append(f"*{ds['description']}*\n")
 
-    lines.append(f"\nTotal languages: {len(language_map)}")
-    lines.append(f"Total docsets: {len(extractors)}")
+            lines.append(f"- **Docset ID:** `{ds['docset']}`")
+
+            # Show language variants if available
+            if ds["languages"]:
+                lang_str = ", ".join(f"`{l}`" for l in ds["languages"])
+                lines.append(f"- **Language variants:** {lang_str}")
+
+            # Add example commands
+            lines.append("\n**Quick start commands:**")
+            lines.append(f"```")
+            lines.append(f"# List all types in this docset")
+            lines.append(f"list_types(\"{ds['docset']}\")")
+            if ds["languages"]:
+                lines.append(f"\n# List types for specific language")
+                lines.append(
+                    f"list_types(\"{ds['docset']}\", language=\"{ds['languages'][0]}\")"
+                )
+            lines.append(f"\n# Search for specific documentation")
+            lines.append(f"search_docs(\"YourQuery\", docset=\"{ds['docset']}\")")
+            lines.append(f"```")
+            lines.append("")
+
+        lines.append("---\n")
+
+    lines.append(
+        f"**Summary:** {len(language_map)} languages, {len(extractors)} docsets total"
+    )
+    lines.append("\n**Next steps:**")
+    lines.append('1. Use `list_types("docset_id")` to explore documentation types')
+    lines.append(
+        '2. Use `list_entries("docset_id", type="TypeName")` to browse entries'
+    )
+    lines.append("3. Use `search_docs()` to find specific documentation")
 
     return "\n".join(lines)
 
@@ -1326,11 +1685,14 @@ def list_docsets_by_language(language: str) -> str:
     """
     Find all docsets that provide documentation for a specific programming language.
 
+    This tool helps you find relevant documentation for a specific language,
+    returning ready-to-use examples for querying.
+
     Args:
         language: The programming language to search for (e.g., 'python', 'javascript', 'swift')
 
     Returns:
-        List of docsets that support the specified language
+        Formatted list of docsets with usage examples for the specified language
     """
     if not extractors:
         return (
@@ -1338,7 +1700,7 @@ def list_docsets_by_language(language: str) -> str:
         )
 
     language_lower = language.lower()
-    matching_docsets: list[DocsetInfo] = []
+    matching_docsets: list[tuple[str, MatchedDocsetInfo]] = []
 
     for docset_type, extractor in extractors.items():
         config = extractor.config
@@ -1346,16 +1708,21 @@ def list_docsets_by_language(language: str) -> str:
 
         # Check various ways a docset might be related to the language
         matches = False
+        matched_lang = None
 
         # Direct name match
         if language_lower in name_lower:
             matches = True
+            # Get the first available language variant
+            if "languages" in config:
+                matched_lang = next(iter(config["languages"].keys()))
 
         # Check language variants
         elif "languages" in config:
             for lang_key in config["languages"].keys():
                 if language_lower in lang_key.lower():
                     matches = True
+                    matched_lang = lang_key
                     break
 
         # Special cases
@@ -1375,32 +1742,307 @@ def list_docsets_by_language(language: str) -> str:
             matches = True
 
         if matches:
-            lang_info = []
-            if "languages" in config:
-                lang_info = list(config["languages"].keys())
-
-            matching_docsets.append(
-                {"docset": docset_type, "name": config["name"], "languages": lang_info}
-            )
+            matched_info: MatchedDocsetInfo = {
+                "config": config,
+                "matched_lang": matched_lang,
+            }
+            matching_docsets.append((docset_type, matched_info))
 
     if not matching_docsets:
         return f"No docsets found for language '{language}'. Try 'list_languages' to see available options."
 
     # Format output
     lines = [f"# Docsets for {language.title()}\n"]
+    lines.append("Use these with the `search_docs` tool:\n")
 
-    for ds in matching_docsets:
-        lines.append(f"## {ds['name']} (`{ds['docset']}`)")
+    for docset_id, info in matching_docsets:
+        config = info["config"]
+        matched_lang = info["matched_lang"]
 
-        if ds["languages"]:
-            lines.append(f"**Language variants:** {', '.join(ds['languages'])}")
+        lines.append(f"## {config['name']}")
 
-        lines.append(
-            f"**Usage:** `search_docs(query=\"your_search\", docset=\"{ds['docset']}\")`"
-        )
+        if config.get("description"):
+            lines.append(f"*{config['description']}*\n")
+
+        lines.append(f"- **Docset ID:** `{docset_id}`")
+
+        if "languages" in config:
+            lang_str = ", ".join(f"`{lang}`" for lang in config["languages"].keys())
+            lines.append(f"- **Languages:** {lang_str}")
+
+        # Show the example with the matched language if available
+        if matched_lang:
+            lines.append(
+                f'- **Example:** `search_docs("YourQuery", docset="{docset_id}", language="{matched_lang}")`'
+            )
+        elif "languages" in config and config["languages"]:
+            default_lang = next(iter(config["languages"].keys()))
+            lines.append(
+                f'- **Example:** `search_docs("YourQuery", docset="{docset_id}", language="{default_lang}")`'
+            )
+        else:
+            lines.append(
+                f'- **Example:** `search_docs("YourQuery", docset="{docset_id}")`'
+            )
+
         lines.append("")
 
-    lines.append(f"\nFound {len(matching_docsets)} docset(s) for {language}")
+    lines.append(f"Found {len(matching_docsets)} docset(s) for {language}")
+
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def list_types(docset: str, language: str | None = None) -> str:
+    """
+    List all documentation types available in a docset with examples.
+
+    This shows the hierarchy of documentation types (e.g., Class, Method, Function)
+    available in a docset, with example entries for each type.
+
+    Args:
+        docset: Docset identifier (e.g., 'apple_api_reference', 'nodejs')
+        language: Optional language filter (e.g., 'swift', 'objc')
+
+    Returns:
+        List of types with example entries and counts
+    """
+    if docset not in extractors:
+        available = list(extractors.keys())
+        return f"Error: docset '{docset}' not available. Available: {available}"
+
+    extractor = extractors[docset]
+    config = extractor.config
+
+    # Get the database connection
+    conn = sqlite3.connect(extractor.optimized_db)
+    cursor = conn.cursor()
+
+    # Build language filter if specified
+    lang_filter = ""
+    if language:
+        if language not in config.get("languages", {}):
+            return f"Error: language '{language}' not available for {config['name']}. Available: {list(config.get('languages', {}).keys())}"
+        lang_filter = config["languages"][language]["filter"]
+
+    # Get type counts and examples
+    lines = [f"# Documentation Types in {config['name']}"]
+    if language:
+        lines.append(f"*Filtered by language: {language}*\n")
+    else:
+        lines.append("")
+
+    # Query for types with counts
+    if lang_filter:
+        cursor.execute(
+            """
+            SELECT type, COUNT(*) as count
+            FROM searchIndex
+            WHERE path LIKE ?
+            GROUP BY type
+            ORDER BY count DESC
+        """,
+            (f"%{lang_filter}%",),
+        )
+    else:
+        cursor.execute(
+            """
+            SELECT type, COUNT(*) as count
+            FROM searchIndex
+            GROUP BY type
+            ORDER BY count DESC
+        """
+        )
+
+    type_counts = cursor.fetchall()
+
+    if not type_counts:
+        conn.close()
+        return f"No types found in {config['name']}" + (
+            f" for language {language}" if language else ""
+        )
+
+    for doc_type, count in type_counts:
+        lines.append(f"## {doc_type} ({count:,} entries)")
+
+        # Get 3 examples for this type
+        if lang_filter:
+            cursor.execute(
+                """
+                SELECT name
+                FROM searchIndex
+                WHERE type = ? AND path LIKE ?
+                ORDER BY LENGTH(name), name
+                LIMIT 3
+            """,
+                (doc_type, f"%{lang_filter}%"),
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT name
+                FROM searchIndex
+                WHERE type = ?
+                ORDER BY LENGTH(name), name
+                LIMIT 3
+            """,
+                (doc_type,),
+            )
+
+        examples = cursor.fetchall()
+        if examples:
+            lines.append("Examples:")
+            for (name,) in examples:
+                lines.append(f"- `{name}`")
+        lines.append("")
+
+    # Add usage hint
+    lines.append("---")
+    usage_hint = f'Use `list_entries(docset="{docset}", type="TypeName"'
+    if language:
+        usage_hint += f', language="{language}"'
+    usage_hint += ")` to see all entries of a specific type."
+    lines.append(usage_hint)
+
+    conn.close()
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def list_entries(
+    docset: str,
+    type: str | None = None,
+    language: str | None = None,
+    starts_with: str | None = None,
+    contains: str | None = None,
+    max_results: int = 50,
+) -> str:
+    """
+    List documentation entries with flexible filtering options.
+
+    This tool allows you to browse documentation entries with various filters
+    to find exactly what you're looking for.
+
+    Args:
+        docset: Docset identifier (e.g., 'apple_api_reference', 'nodejs')
+        type: Filter by documentation type (e.g., 'Class', 'Method', 'Function')
+        language: Filter by language (e.g., 'swift', 'objc')
+        starts_with: Filter entries starting with this prefix (e.g., 'UI', 'NS')
+        contains: Filter entries containing this substring
+        max_results: Maximum results to return (1-200, default 50)
+
+    Returns:
+        List of matching documentation entries
+    """
+    if docset not in extractors:
+        available = list(extractors.keys())
+        return f"Error: docset '{docset}' not available. Available: {available}"
+
+    if not 1 <= max_results <= 200:
+        return "Error: max_results must be between 1 and 200"
+
+    extractor = extractors[docset]
+    config = extractor.config
+
+    # Build query conditions
+    conditions: list[str] = []
+    params: list[Union[str, int]] = []
+
+    if type:
+        conditions.append("type = ?")
+        params.append(type)
+
+    if language and language in config.get("languages", {}):
+        lang_filter = config["languages"][language]["filter"]
+        conditions.append("path LIKE ?")
+        params.append(f"%{lang_filter}%")
+
+    if starts_with:
+        conditions.append("name LIKE ?")
+        params.append(f"{starts_with}%")
+
+    if contains:
+        conditions.append("name LIKE ?")
+        params.append(f"%{contains}%")
+
+    # Build the query
+    where_clause = " AND ".join(conditions) if conditions else "1=1"
+
+    conn = sqlite3.connect(extractor.optimized_db)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        f"""
+        SELECT name, type
+        FROM searchIndex
+        WHERE {where_clause}
+        ORDER BY name
+        LIMIT ?
+    """,
+        params + [max_results],
+    )
+
+    results = cursor.fetchall()
+    conn.close()
+
+    if not results:
+        filters: list[str] = []
+        if type:
+            filters.append(f"type={type}")
+        if language:
+            filters.append(f"language={language}")
+        if starts_with:
+            filters.append(f"starts_with={starts_with}")
+        if contains:
+            filters.append(f"contains={contains}")
+        return (
+            f"No entries found in {config['name']} with filters: {', '.join(filters)}"
+        )
+
+    # Format output
+    lines = [f"# Documentation Entries in {config['name']}"]
+
+    # Show active filters
+    if type or language or starts_with or contains:
+        lines.append("\nActive filters:")
+        if type:
+            lines.append(f"- Type: {type}")
+        if language:
+            lines.append(f"- Language: {language}")
+        if starts_with:
+            lines.append(f"- Starts with: {starts_with}")
+        if contains:
+            lines.append(f"- Contains: {contains}")
+        lines.append("")
+
+    # Group by type if not filtering by type
+    if not type:
+        from collections import defaultdict
+
+        by_type: defaultdict[str, list[str]] = defaultdict(list)
+        for name, doc_type in results:
+            by_type[doc_type].append(name)
+
+        for doc_type, names in sorted(by_type.items()):
+            lines.append(f"## {doc_type} ({len(names)})")
+            for name in names[:10]:  # Show first 10 of each type
+                lines.append(f"- `{name}`")
+            if len(names) > 10:
+                lines.append(f"- ... and {len(names) - 10} more")
+            lines.append("")
+    else:
+        # Just list all entries
+        lines.append(f"## {type} entries ({len(results)})\n")
+        for name, _ in results:
+            lines.append(f"- `{name}`")
+
+    lines.append("\n---")
+    lines.append(f"Showing {len(results)} of {max_results} max results.")
+    search_hint = f'Use `search_docs("{results[0][0]}", docset="{docset}"'
+    if language:
+        search_hint += f', language="{language}"'
+    search_hint += ")` to see full documentation."
+    lines.append(search_hint)
 
     return "\n".join(lines)
 
