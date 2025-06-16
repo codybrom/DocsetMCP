@@ -129,6 +129,49 @@ Use `list_available_docsets` to see all docsets installed on your system.
 
 ## Configuration
 
+### Custom Docset Locations
+
+By default, DocsetMCP looks for docsets in Dash's standard directories:
+
+- **Docsets**: `~/Library/Application Support/Dash/DocSets`
+- **Cheatsheets**: `~/Library/Application Support/Dash/Cheat Sheets`
+
+You can customize these locations using:
+
+#### Environment Variables
+
+```bash
+# Set custom docset directory
+export DOCSET_PATH="/path/to/your/docsets"
+
+# Set custom cheatsheet directory  
+export CHEATSHEET_PATH="/path/to/your/cheatsheets"
+
+# Run with custom paths
+docsetmcp
+```
+
+#### Command Line Arguments
+
+```bash
+# Test with custom docset path
+docsetmcp --docset-path "/path/to/your/docsets" --list-docsets
+
+# Test with custom cheatsheet path
+docsetmcp --cheatsheet-path "/path/to/your/cheatsheets" --test-connection
+
+# Use both custom paths
+docsetmcp --docset-path "/custom/docsets" --cheatsheet-path "/custom/cheatsheets"
+```
+
+**Priority Order:**
+
+1. CLI arguments (highest priority)
+2. Environment variables
+3. Default Dash locations (lowest priority)
+
+### MCP Client Setup
+
 Choose your MCP client below for specific setup instructions:
 
 <details>
@@ -142,6 +185,23 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
     "docsetmcp": {
       "command": "uvx",
       "args": ["docsetmcp"]
+    }
+  }
+}
+```
+
+**For custom docset locations:**
+
+```json
+{
+  "mcpServers": {
+    "docsetmcp": {
+      "command": "uvx",
+      "args": ["docsetmcp"],
+      "env": {
+        "DOCSET_PATH": "/path/to/your/docsets",
+        "CHEATSHEET_PATH": "/path/to/your/cheatsheets"
+      }
     }
   }
 }
@@ -483,25 +543,108 @@ cd docsetmcp
 # Install in development mode
 pip install -e .
 
-# Run tests
-pytest tests/ -v
+# Install all development dependencies
+pip install -r requirements.txt
+
+# Set up pre-commit hooks
+pre-commit install
 ```
 
-### Running Tests
+### Testing
 
 ```bash
-# Quick tests (structure validation)
+# Run basic structure tests
 pytest tests/test_docsets.py::TestDocsets::test_yaml_structure -v
 
-# Full test suite
+# Run quick tests (structure + existence)
+pytest tests/ -k "yaml_structure or test_docset_exists" -v
+
+# Run full test suite (all docsets)
 pytest tests/ -v
 
-# With coverage
+# Run with coverage
 pytest tests/ --cov=docsetmcp --cov-report=html -v
+
+# Run tests in parallel
+pytest tests/ -n auto -v
 
 # Validate cheatsheets
 python scripts/validate_cheatsheets.py
 ```
+
+### Code Quality
+
+```bash
+# Format Python code with Black
+black docsetmcp/
+
+# Format YAML files with yamlfix
+yamlfix docsetmcp/docsets/*.yaml
+
+# Run all pre-commit hooks
+pre-commit run --all-files
+
+# Run specific hook
+pre-commit run yamlfix --all-files
+
+# Run spell check (cspell installed automatically during setup)
+npm run spell
+```
+
+### CLI Commands
+
+```bash
+# Test version
+docsetmcp --version
+
+# List available docsets
+docsetmcp --list-docsets
+
+# Test server startup
+docsetmcp --test-connection
+
+# Test with custom paths
+docsetmcp --docset-path "/custom/path" --list-docsets
+```
+
+### Building Distribution
+
+```bash
+# Build package
+python setup.py sdist bdist_wheel
+
+# Install from source
+pip install .
+```
+
+## Architecture
+
+### Core Components
+
+- **docsetmcp/server.py**: Main MCP server implementation using FastMCP. Contains the DashExtractor class that handles:
+  - Apple cache format (SHA-1 UUID-based with brotli compression)
+  - Tarix format (tar.gz archives)
+  - SQLite database queries for documentation lookup
+  - HTML to Markdown conversion
+
+- **docsetmcp/config_loader.py**: Configuration system that loads YAML configs for 165+ supported docsets. Provides smart defaults and handles both simple and complex configuration formats.
+
+- **docsetmcp/docsets/**: YAML configuration files for each supported docset, defining:
+  - Docset paths and formats
+  - Language variants and filters
+  - Type priorities for search results
+
+### Key Implementation Details
+
+1. **Multi-Format Support**: The server detects and handles both Apple's modern cache format (using SHA-1 based UUIDs) and the older tarix compression format automatically based on docset configuration.
+
+2. **Caching Strategy**: Extracted documentation is cached in memory (_fs_cache for Apple format, _html_cache for tarix) to improve performance on repeated queries.
+
+3. **Search Algorithm**: Uses SQLite case-insensitive LIKE queries on the optimizedIndex.dsidx database. Results are ranked by match type (exact > prefix > substring) and then by dynamic type ordering from docset configuration files. Only returns entries where the search term matches the item name.
+
+4. **Configuration Loading**: The ConfigLoader applies smart defaults, allowing minimal YAML configs while supporting complex overrides when needed.
+
+5. **Container Type Detection**: Framework, class, and module entries automatically include drilldown notes when they contain additional members, guiding users to search for more specific content.
 
 ## Contributing
 

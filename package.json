@@ -1,6 +1,6 @@
 {
   "name": "docsetmcp",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Model Context Protocol server for Dash-style docsets",
   "scripts": {
     "setup": "./scripts/setup_env.sh",
