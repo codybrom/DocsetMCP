@@ -1,19 +1,121 @@
-# DocsetMCP - Unofficial Dash MCP Server
+# DocsetMCP
 
-Search local documentation from Dash docsets through the Model Context Protocol (MCP).
+[![PyPI](https://img.shields.io/pypi/v/docsetmcp)](https://pypi.org/project/docsetmcp/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/pypi/pyversions/docsetmcp)](https://pypi.org/project/docsetmcp/)
 
-## What is MCP?
+**Access your local Dash documentation directly from AI assistants** 🚀
 
-MCP (Model Context Protocol) is a standard for connecting AI assistants to external tools and data sources. This allows Claude and other AI assistants to directly access documentation from your local Dash installation.
+DocsetMCP is a Model Context Protocol (MCP) server that seamlessly integrates your local Dash docsets with AI assistants like Claude, enabling instant access to offline documentation without leaving your conversation.
 
-## Features
+## 📋 Table of Contents
 
-- **Multi-Docset Support**: Search Apple, NodeJS, Bash, C, Arduino, Font Awesome, and more
-- **Cheatsheet Support**: Quick access to Git, Vim, Docker, and other cheatsheets
-- **Direct Access**: Search documentation without leaving your conversation
-- **Fast Lookups**: Efficient extraction from both Apple cache and tarix formats
+- [Why DocsetMCP?](#why-docsetmcp)
+- [Quick Start](#quick-start)
+- [Features](#-features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage Examples](#usage-examples)
+- [Available Tools](#available-tools)
+- [Troubleshooting](#troubleshooting)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Why DocsetMCP?
+
+- 📚 **Instant Documentation**: No switching, no web searches. Get straight to the docs directly in your AI conversation
+- 🔒 **Local and Private**: Work with docset files on your machine
+- ⚡ **Lightning Fast**: Optimized caching and direct database queries
+- 🎯 **Precise Results**: Get exactly what you need with smart filtering
+
+## Quick Start
+
+```json
+{
+  "mcpServers": {
+    "docsetmcp": {
+      "command": "uvx",
+      "args": ["docsetmcp"]
+    }
+  }
+}
+```
+
+Add to your MCP config and restart your MCP client. Then try asking something like "Find me the AppIntent documentation"
+
+## ✨ Features
+
+### Documentation Search
+
+- **Multi-Docset Support**: Search across 165+ supported docsets including Apple, NodeJS, Python, and more
+- **Language Filtering**: Target specific programming languages within docsets
+- **Smart Extraction**: Handles both Apple's modern cache format and traditional tarix archives
+- **Type Prioritization**: Results sorted by relevance (Protocol > Class > Function > etc.)
+
+### Cheatsheet Access  
+
+- **Quick Reference**: Instant access to Git, Vim, Docker, and 40+ other cheatsheets
+- **Fuzzy Matching**: Find cheatsheets even with partial names
+- **Category Browsing**: Explore commands by category within each cheatsheet
+- **Search Within**: Query specific commands inside any cheatsheet
+
+### Performance & Integration
+
+- **Efficient Caching**: In-memory caching for repeated queries
+- **Direct Database Access**: No intermediate servers or APIs
+- **Universal**: Works with Claude Desktop, Cursor, VS Code, and any MCP-compatible client
 - **Framework Discovery**: List all available frameworks/types in any docset
-- **Smart Search**: Fuzzy matching for cheatsheet names
+
+## 📦 Supported Docsets
+
+DocsetMCP supports 165+ docsets including:
+
+<details>
+<summary>**Popular Languages**</summary>
+
+- Python (2 & 3)
+- JavaScript / TypeScript
+- Java
+- C / C++
+- Go
+- Rust
+- Ruby
+- Swift / Objective-C
+- PHP
+- Bash
+- And many more...
+
+</details>
+
+<details>
+<summary>**Web Frameworks**</summary>
+
+- React / Angular / Vue
+- Node.js / Express
+- Django / Flask
+- Ruby on Rails
+- Bootstrap
+- jQuery
+- And many more...
+
+</details>
+
+<details>
+<summary>**Developer Tools**</summary>
+
+- Git (cheatsheet)
+- Docker (cheatsheet)
+- Vim (cheatsheet)
+- MySQL / PostgreSQL
+- MongoDB / Redis
+- nginx / Apache
+- And many more...
+
+</details>
+
+Use `list_available_docsets` to see all docsets installed on your system.
 
 ## Prerequisites
 
@@ -23,17 +125,76 @@ MCP (Model Context Protocol) is a standard for connecting AI assistants to exter
 - UV package manager ([How to Install](https://docs.astral.sh/uv/getting-started/installation/))
 - An AI assistant that supports MCP (Claude Desktop, Claude Code CLI, Cursor IDE, etc.)
 
+## Configuration
+
+Choose your MCP client below for specific setup instructions:
+
+<details>
+<summary>**🤖 Claude Desktop**</summary>
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "docsetmcp": {
+      "command": "uvx",
+      "args": ["docsetmcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>**⌨️ Claude Code CLI**</summary>
+
+```bash
+# For current project
+claude mcp add docsetmcp "uvx docsetmcp"
+
+# For all projects
+claude mcp add --scope user docsetmcp "uvx docsetmcp"
+```
+
+</details>
+
+<details>
+<summary>**📝 Cursor, VS Code, Windsurf and other MCP-compatible clients**</summary>
+
+Add to your MCP configuration (Cursor: `.mcp/mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "docsetmcp": {
+      "command": "uvx",
+      "args": ["docsetmcp"]
+    }
+  }
+}
+```
+
+**Note**: Restart your client and check your MCP settings for connection status.
+
+</details>
+
 ## Installation
 
-### Simple Installation (Recommended)
+### No Installation Required (Recommended)
 
-1. **Install from PyPI**:
+If your MCP client supports `uvx`, no installation is needed! The package will be automatically downloaded and run when needed. See the [Quick Start](#quick-start) or [Configuration](#configuration) sections.
 
-   ```bash
-   pip install docsetmcp
-   ```
+### Manual Installation
 
-2. **Configure your MCP client** (see configuration options below)
+If you prefer to install locally or your MCP client doesn't support `uvx`:
+
+```bash
+pip install docsetmcp
+```
+
+Then use `docsetmcp` instead of `uvx docsetmcp` in your configuration.
 
 ### Development Installation
 
@@ -67,84 +228,53 @@ MCP (Model Context Protocol) is a standard for connecting AI assistants to exter
    python scripts/validate_cheatsheets.py
    ```
 
-## Configuration
+## Usage Examples
 
-### Claude Desktop
+Once configured, you can ask your AI assistant to search documentation naturally:
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+### 🍎 iOS/macOS Development
 
-```json
-{
-  "mcpServers": {
-    "dash": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "docsetmcp"
-      ]
-    }
-  }
-}
+```text
+"Search for URLSession documentation"
+"Show me how to use AppIntent in SwiftUI"
+"Find NSPredicate examples"
 ```
 
-Restart Claude Desktop.
+### 🌐 Web Development
 
-### Claude Code CLI
-
-```bash
-claude mcp add dash "uvx docsetmcp"
-
-# Or for all projects
-claude mcp add --scope user dash "uvx docsetmcp"
+```text
+"Look up Express.js middleware documentation"
+"Search React hooks in the React docset"
+"Find CSS flexbox properties"
 ```
 
-### Cursor or other MCP Clients that use `mcp.json`
+### 🛠️ DevOps & Terminal
 
-Add/Update `mcp.json` in your project root:
-
-```json
-{
-  "mcpServers": {
-    "dash": {
-      "command": "uvx",
-      "args": ["docsetmcp"]
-    }
-  }
-}
+```text
+"Search git rebase commands in the Git cheatsheet"
+"Show Docker compose syntax from the cheatsheet"
+"Find bash array manipulation commands"
 ```
 
-Restart Cursor and check Settings > MCP for connection status.
+### 📊 Data Science
 
-## Usage
-
-Once configured in any MCP client, you can use these commands:
-
-### Search Documentation
-
-```txt
-Use search_docs to find documentation for AppIntent
+```text
+"Search pandas DataFrame methods"
+"Look up NumPy array broadcasting"
+"Find matplotlib pyplot functions"
 ```
 
-### List Available Docsets
+### Advanced Usage
 
-```txt
-Use list_available_docsets to see all loaded docsets
-```
+```text
+# Search specific docset with language filter
+"Use search_docs for 'URLSession' in the apple_api_reference docset with Swift language"
 
-### Search Specific Docsets
+# List all available tools
+"What frameworks are available in the nodejs docset?"
 
-```txt
-Use search_docs with query "fs", docset "nodejs", language "javascript", and max_results 3
-```
-
-### Search Cheatsheets
-
-```txt
-Use search_cheatsheet with cheatsheet "git" to see all Git categories
-
-Use search_cheatsheet with cheatsheet "git", query "branch" to find branch-related commands
-
-Use list_available_cheatsheets to see all available cheatsheets
+# Browse cheatsheet categories
+"Show all categories in the vim cheatsheet"
 ```
 
 ## How It Works
@@ -154,129 +284,182 @@ Use list_available_cheatsheets to see all available cheatsheets
 3. **Smart Extraction**: Decompresses Apple's DocC JSON or extracts HTML from tarix archives
 4. **Markdown Formatting**: Converts documentation to readable Markdown
 
-## Tools Available
+## Available Tools
 
-### search_docs
+DocsetMCP provides five powerful tools for accessing your documentation:
+
+### 🔍 `search_docs`
 
 Search and extract documentation from any docset.
 
-**Parameters**:
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `query` | string | API/function name to search | *required* |
+| `docset` | string | Target docset (e.g., 'nodejs', 'python_3') | 'apple_api_reference' |
+| `language` | string | Programming language filter | - |
+| `max_results` | int | Number of results (1-10) | 3 |
 
-- `query` (required): The API/function name to search for
-- `docset` (optional): Docset to search in (default: "apple_api_reference")
-- `language` (optional): Programming language variant (varies by docset)
-- `max_results` (optional): 1-10 results (default: 3)
+### 📋 `search_cheatsheet`
 
-### search_cheatsheet
+Search Dash cheatsheets for quick command reference.
 
-Search a Dash cheatsheet for quick reference information.
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `cheatsheet` | string | Cheatsheet name (e.g., 'git', 'vim') | *required* |
+| `query` | string | Search within cheatsheet | - |
+| `category` | string | Filter by category | - |
+| `max_results` | int | Number of results (1-50) | 10 |
 
-**Parameters**:
+### 📚 `list_available_docsets`
 
-- `cheatsheet` (required): Name of the cheatsheet (e.g., 'git', 'vim', 'docker')
-- `query` (optional): Search query within the cheatsheet
-- `category` (optional): Category to filter results
-- `max_results` (optional): 1-50 results (default: 10)
+List all installed Dash docsets with their supported languages.
 
-### list_available_docsets
+### 📝 `list_available_cheatsheets`
 
-List all available Dash docsets that can be searched.
+List all available Dash cheatsheets that can be searched.
 
-### list_available_cheatsheets
+### 🏗️ `list_frameworks`
 
-List all available Dash cheatsheets.
+List frameworks/types within a specific docset.
 
-### list_frameworks
-
-List available frameworks/types in a specific docset.
-
-**Parameters**:
-
-- `docset` (optional): Docset to list from (default: "apple_api_reference")
-- `filter` (optional): Filter framework/type names
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `docset` | string | Target docset | 'apple_api_reference' |
+| `filter` | string | Filter framework names | - |
 
 ## Troubleshooting
 
-- **"Docset not found"**: Download the desired docset in Dash.app first
-- **No results found**: The content might not be in your offline cache
-- **MCP connection failed**: Check your MCP client logs and ensure the command path is correct
+<details>
+<summary>**❌ "Docset not found" error**</summary>
 
-## Technical Details
+This means the docset isn't installed in Dash. To fix:
 
-The MCP server:
+1. Open Dash.app
+2. Go to Preferences → Downloads
+3. Download the required docset
+4. Restart your MCP client
 
-- Implements the MCP protocol for tool integration
-- Supports both Apple cache format (SHA-1 UUID-based) and tarix compression
-- Caches extracted documentation for performance
-- Auto-detects available docsets on startup
-- Handles multiple programming languages per docset
+</details>
 
-## Adding New Docset Support
+<details>
+<summary>**🔌 MCP connection failed**</summary>
 
-To add support for a new docset, create a YAML configuration file in `docsetmcp/docsets/`:
+1. **Check installation**: Run `pip show docsetmcp` to verify installation
+2. **Test manually**: Run `uvx docsetmcp` in terminal - you should see MCP output
+3. **Check logs**:
+   - Claude Desktop: Check Console.app for Claude logs
+   - Cursor: Check Output → MCP panel
+4. **Verify config path**: Ensure config file is in the correct location
 
-### Simple Configuration
+</details>
 
-For most docsets using standard tarix format:
+<details>
+<summary>**📭 No results found**</summary>
 
-```yaml
-# docsetmcp/docsets/my_docset.yaml
-name: My Docset
-description: Brief description of the docset
-docset_path: My_Docset/My_Docset.docset
-languages:
-  - python
-  - javascript
-types:
-  - Class
-  - Function
-  - Module
-  - Variable
+- The content might not be in your local Dash cache
+- Try searching with different terms or partial matches
+- Use `list_available_docsets` to verify the docset is loaded
+- Some docsets may use different naming conventions (e.g., 'fs' vs 'filesystem')
+
+</details>
+
+<details>
+<summary>**🐛 Other issues**</summary>
+
+1. **Python version**: Ensure you have Python 3.10 or higher
+2. **UV not found**: Install UV package manager from <https://docs.astral.sh/uv/>
+3. **Permission denied**: Check file permissions on Dash docsets directory
+4. **Report bugs**: Open an issue at <https://github.com/codybrom/docsetmcp/issues>
+
+</details>
+
+## Development
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/codybrom/docsetmcp.git
+cd docsetmcp
+
+# Install in development mode
+pip install -e .
+
+# Run tests
+pytest tests/ -v
 ```
 
-### Advanced Configuration
+### Running Tests
 
-For docsets with special requirements:
+```bash
+# Quick tests (structure validation)
+pytest tests/test_docsets.py::TestDocsets::test_yaml_structure -v
 
-```yaml
-name: Apple API Reference
-description: Complete Apple developer documentation for macOS, iOS, watchOS, and tvOS
-docset_name: Apple_API_Reference
-docset_path: Apple_API_Reference.docset
-languages:
-  objc:
-    filter: language=occ
-    prefix: lc
-  swift:
-    filter: language=swift
-    prefix: ls
-types:
-  - Method
-  - Property
-  - Constant
-  - Variable
-  - Constructor
-  - Function
-  - Type
-  - Struct
-  - Class
-  - Protocol
-format: apple
-framework_pattern: documentation/([^/]+)/
+# Full test suite
+pytest tests/ -v
+
+# With coverage
+pytest tests/ --cov=docsetmcp --cov-report=html -v
+
+# Validate cheatsheets
+python scripts/validate_cheatsheets.py
 ```
 
-### Configuration Fields
+## Contributing
 
-- **name**: Display name for the docset
-- **description**: Brief description of what the docset contains
-- **docset_path**: Full path to the .docset bundle including parent folder (e.g., "Python_3/Python 3.docset")
-- **languages**: List of supported languages (simple) or dict with language-specific filters/prefixes
-- **types**: List of documentation types in priority order
-- **format**: "tarix" (default) or "apple" for Apple's cache format
-- **framework_pattern**: Pattern to identify framework names in paths (Apple format only)
+We welcome contributions! Here's how you can help:
 
-The ConfigLoader automatically applies smart defaults, so you only need to specify non-default values.
+### Adding New Docset Support
+
+1. Create a YAML configuration in `docsetmcp/docsets/`:
+
+   ```yaml
+   # docsetmcp/docsets/my_docset.yaml
+   name: My Docset
+   description: Brief description of the docset
+   docset_path: My_Docset/My_Docset.docset
+   languages:
+     - python
+     - javascript
+   ```
+
+2. Test your configuration:
+
+   ```bash
+   pytest tests/test_docsets.py -k "my_docset" -v
+   ```
+
+3. Submit a pull request
+
+### Reporting Issues
+
+- 🐛 [Bug Reports](https://github.com/codybrom/docsetmcp/issues/new?labels=bug)
+- 💡 [Feature Requests](https://github.com/codybrom/docsetmcp/issues/new?labels=enhancement)
+- 📚 [Documentation Issues](https://github.com/codybrom/docsetmcp/issues/new?labels=documentation)
+
+### Development Guidelines
+
+- Follow PEP 8 style guidelines
+- Add tests for new features
+- Update documentation as needed
+- Keep commits focused and descriptive
+
+## Technical Architecture
+
+DocsetMCP leverages Dash's internal structure for efficient documentation access:
+
+- **Format Support**: Handles both Apple's modern cache format (SHA-1 UUID-based with brotli compression) and traditional tarix archives
+- **Caching Strategy**: In-memory caching for repeated queries
+- **Database Access**: Direct SQLite queries to Dash's optimized indexes
+- **Content Extraction**: Smart extraction with fallback strategies
+- **Type System**: Full type hints for better IDE support
 
 ## License
 
-MIT License - Feel free to modify and extend\!
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Thanks to [Kapeli](https://kapeli.com/) for creating Dash
+- Built on the [Model Context Protocol](https://modelcontextprotocol.io/) standard
+- Inspired by the MCP community and ecosystem

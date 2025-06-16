@@ -10,6 +10,18 @@
     "[yaml]": {
         "editor.formatOnSave": false
     },
+    // Markdown linting configuration
+    "[markdown]": {
+        "editor.formatOnSave": false
+    },
+    "markdownlint.config": {
+        "MD033": {
+            "allowed_elements": [
+                "details",
+                "summary",
+            ]
+        }
+    },
     // Spell checker configuration
     "cSpell.customDictionaries": {
         "docsetmcp": {

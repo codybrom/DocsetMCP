@@ -329,10 +329,12 @@ class DashExtractor:
             if text:
                 lines.append(f"\n## Summary\n\n{text}")
 
-        # Declaration
+        # Primary Content Sections
         sections = doc.get("primaryContentSections", [])
         for section in sections:
-            if section.get("kind") == "declarations":
+            kind = section.get("kind", "")
+
+            if kind == "declarations":
                 decls = section.get("declarations", [])
                 if decls and decls[0].get("tokens"):
                     lines.append("\n## Declaration\n")
@@ -340,13 +342,37 @@ class DashExtractor:
                     code = "".join(t.get("text", "") for t in tokens)
                     lang = decls[0].get("languages", ["swift"])[0]
                     lines.append(f"```{lang}\n{code}\n```")
-                break
+
+            elif kind == "parameters":
+                params = section.get("parameters", [])
+                if params:
+                    lines.append("\n## Parameters\n")
+                    for param in params:
+                        param_name = param.get("name", "")
+                        param_content = param.get("content", [])
+                        param_text = self._extract_text(param_content)
+                        if param_name and param_text:
+                            lines.append(f"- **{param_name}**: {param_text}")
+
+            elif kind == "content":
+                content = section.get("content", [])
+                text = self._extract_text(content)
+                if text:
+                    lines.append(f"\n{text}")
+
+            # Handle other section types as generic content
+            elif "content" in section:
+                content = section.get("content", [])
+                text = self._extract_text(content)
+                if text:
+                    section_title = kind.replace("_", " ").title()
+                    lines.append(f"\n## {section_title}\n\n{text}")
 
         # Discussion
         discussion = doc.get("discussionSections", [])
         if discussion:
             lines.append("\n## Discussion")
-            for section in discussion[:2]:  # Limit to first 2 sections
+            for section in discussion:  # Get all discussion sections
                 content = section.get("content", [])
                 text = self._extract_text(content)
                 if text:
