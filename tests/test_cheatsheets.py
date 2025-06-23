@@ -330,7 +330,7 @@ class TestCheatsheetMCPTools:
         mock_path.exists.return_value = False
 
         result = list_available_cheatsheets()
-        assert "No Dash cheatsheets directory found" in result
+        assert "Cheatsheets directory not found" in result
 
 
 if __name__ == "__main__":

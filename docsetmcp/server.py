@@ -16,12 +16,20 @@ from typing import Union, TypedDict, Optional
 from mcp.server.fastmcp import FastMCP
 
 # Import shared types
-from .types import (
-    ContentItem,
-    AppleDocumentation,
-    ProcessedDocsetConfig,
-    DocsetInfo,
-)
+try:
+    from .types import (
+        ContentItem,
+        AppleDocumentation,
+        ProcessedDocsetConfig,
+        DocsetInfo,
+    )
+except ImportError:
+    from docsetmcp.types import (
+        ContentItem,
+        AppleDocumentation,
+        ProcessedDocsetConfig,
+        DocsetInfo,
+    )
 
 
 class MatchedDocsetInfo(TypedDict):
@@ -38,7 +46,10 @@ class DashExtractor:
 
     def __init__(self, docset_type: str, docsets_base_path: str | None = None):
         # Load docset configuration using new config loader
-        from .config_loader import ConfigLoader
+        try:
+            from .config_loader import ConfigLoader
+        except ImportError:
+            from docsetmcp.config_loader import ConfigLoader
 
         loader = ConfigLoader()
 
@@ -47,34 +58,55 @@ class DashExtractor:
         except FileNotFoundError:
             raise ValueError(f"Unsupported docset type: {docset_type}")
 
-        # Use custom docset location if provided, otherwise use default Dash location
+        # Build list of paths to search for docsets
+        search_paths: list[str] = []
+
+        # Use custom docset location if provided, otherwise use configured paths
         if docsets_base_path:
-            dash_docsets_path = os.path.expanduser(docsets_base_path)
+            search_paths.append(os.path.expanduser(docsets_base_path))
         else:
             # Check environment variable for custom location
             env_path = os.getenv("DOCSET_PATH")
             if env_path:
-                dash_docsets_path = os.path.expanduser(env_path)
-            else:
-                # Default Dash docset location on macOS
-                dash_docsets_path = os.path.expanduser(
-                    "~/Library/Application Support/Dash/DocSets"
+                search_paths.append(os.path.expanduser(env_path))
+
+            # Add additional paths from global config
+            if docsetmcp_config.additional_docset_paths:
+                additional_paths = docsetmcp_config.parse_path_list(
+                    docsetmcp_config.additional_docset_paths
                 )
-        
-        self.docset = Path(dash_docsets_path) / self.config["docset_path"]
+                search_paths.extend(additional_paths)
+
+            # If no custom paths specified, use default Dash location
+            if not search_paths:
+                search_paths.append(
+                    os.path.expanduser("~/Library/Application Support/Dash/DocSets")
+                )
+
+        # Find the docset in the search paths
+        self.docset: Path | None = None
+        for search_path in search_paths:
+            potential_docset = Path(search_path) / self.config["docset_path"]
+            if potential_docset.exists():
+                self.docset = potential_docset
+                break
+
+        # If not found, default to first search path for error reporting
+        if self.docset is None:
+            self.docset = Path(search_paths[0]) / self.config["docset_path"]
         # Set up paths based on docset format
         if self.config["format"] == "apple":
             self.fs_dir = self.docset / "Contents/Resources/Documents/fs"
             self.optimized_db = self.docset / "Contents/Resources/optimizedIndex.dsidx"
             self.cache_db = self.docset / "Contents/Resources/Documents/cache.db"
             # Cache for decompressed fs files
-            self._fs_cache: dict[int, bytes] = {}
+            self.fs_cache: dict[int, bytes] = {}
         elif self.config["format"] == "tarix":
             self.optimized_db = self.docset / "Contents/Resources/optimizedIndex.dsidx"
             self.tarix_archive = self.docset / "Contents/Resources/tarix.tgz"
             self.tarix_index = self.docset / "Contents/Resources/tarixIndex.db"
             # Cache for extracted HTML content
-            self._html_cache: dict[str, str] = {}
+            self.html_cache: dict[str, str] = {}
 
         # Check if docset exists
         if not self.docset.exists():
@@ -553,12 +585,12 @@ Try opening Dash and ensuring the '{self.config['name']}' docset is fully downlo
 
         try:
             # Load and cache decompressed data
-            if data_id not in self._fs_cache:
+            if data_id not in self.fs_cache:
                 with open(fs_file, "rb") as f:
                     compressed = f.read()
-                self._fs_cache[data_id] = brotli.decompress(compressed)
+                self.fs_cache[data_id] = brotli.decompress(compressed)
 
-            decompressed = self._fs_cache[data_id]
+            decompressed = self.fs_cache[data_id]
 
             # Extract JSON at offset
             json_data = decompressed[offset : offset + length]
@@ -702,8 +734,8 @@ Try opening Dash and ensuring the '{self.config['name']}' docset is fully downlo
         full_path = f"{docset_folder}/Contents/Resources/Documents/{clean_path}"
 
         # Check cache first
-        if full_path in self._html_cache:
-            return self._html_cache[full_path]
+        if full_path in self.html_cache:
+            return self.html_cache[full_path]
 
         try:
             # Query tarix index for file location
@@ -730,7 +762,7 @@ Try opening Dash and ensuring the '{self.config['name']}' docset is fully downlo
                     extracted_file = tar.extractfile(target_member)
                     if extracted_file:
                         content = extracted_file.read().decode("utf-8", errors="ignore")
-                        self._html_cache[full_path] = content
+                        self.html_cache[full_path] = content
                         return content
                 except KeyError:
                     # If exact path fails, try to find by name
@@ -745,7 +777,7 @@ Try opening Dash and ensuring the '{self.config['name']}' docset is fully downlo
                                 content = extracted_file.read().decode(
                                     "utf-8", errors="ignore"
                                 )
-                                self._html_cache[full_path] = content
+                                self.html_cache[full_path] = content
                                 return content
 
         except Exception:
@@ -793,24 +825,48 @@ class CheatsheetExtractor:
 
     def __init__(self, name: str, cheatsheets_base_path: str | None = None):
         self.name = name
-        
-        # Use custom cheatsheet location if provided, otherwise use default
+
+        # Build list of paths to search for cheatsheets
+        search_paths: list[Path] = []
+
+        # Use custom cheatsheet location if provided, otherwise use configured paths
         if cheatsheets_base_path:
-            self.cheatsheets_path = Path(os.path.expanduser(cheatsheets_base_path))
+            search_paths.append(Path(os.path.expanduser(cheatsheets_base_path)))
         else:
             # Check environment variable for custom location
             env_path = os.getenv("CHEATSHEET_PATH")
             if env_path:
-                self.cheatsheets_path = Path(os.path.expanduser(env_path))
-            else:
-                # Default Dash cheatsheet location
-                self.cheatsheets_path = Path(
-                    os.path.expanduser("~/Library/Application Support/Dash/Cheat Sheets")
+                search_paths.append(Path(os.path.expanduser(env_path)))
+
+            # Add additional paths from global config
+            if docsetmcp_config.additional_cheatsheet_paths:
+                additional_paths = docsetmcp_config.parse_path_list(
+                    docsetmcp_config.additional_cheatsheet_paths
+                )
+                search_paths.extend([Path(p) for p in additional_paths])
+
+            # If no custom paths specified, use default Dash location
+            if not search_paths:
+                search_paths.append(
+                    Path(
+                        os.path.expanduser(
+                            "~/Library/Application Support/Dash/Cheat Sheets"
+                        )
+                    )
                 )
 
-        # Find the cheatsheet using heuristics
-        self.cheatsheet_dir = self._find_cheatsheet_dir(name)
-        if not self.cheatsheet_dir:
+        # Find the cheatsheet in the search paths
+        self.cheatsheet_dir: Path | None = None
+        for search_path in search_paths:
+            self.cheatsheets_path = search_path  # Set for _find_cheatsheet_dir
+            found_dir = self._find_cheatsheet_dir(name)
+            if found_dir:
+                self.cheatsheet_dir = found_dir
+                break
+
+        # If not found, default to first search path for error reporting
+        if self.cheatsheet_dir is None:
+            self.cheatsheets_path = search_paths[0]
             raise FileNotFoundError(f"Cheatsheet '{name}' not found")
 
         # Find the .docset within the directory
@@ -1406,6 +1462,18 @@ class DocsetMCPConfig:
     def __init__(self):
         self.docset_path: str | None = None
         self.cheatsheet_path: str | None = None
+        self.additional_docset_paths: list[str] = []
+        self.additional_cheatsheet_paths: list[str] = []
+
+    def parse_path_list(self, value: str | list[str] | None) -> list[str]:
+        """Parse path list from various input formats"""
+        if not value:
+            return []
+        if isinstance(value, list):
+            return [os.path.expanduser(p) for p in value if p.strip()]
+        # Must be str at this point since we've ruled out None and list
+        return [os.path.expanduser(p.strip()) for p in value.split(":") if p.strip()]
+
 
 # Global config instance
 docsetmcp_config = DocsetMCPConfig()
@@ -1416,29 +1484,101 @@ extractors: dict[str, DashExtractor] = {}
 # Initialize cheatsheet extractors (will be populated as needed)
 cheatsheet_extractors: dict[str, CheatsheetExtractor] = {}
 
+
 def initialize_extractors():
     """Initialize extractors with current configuration"""
     global extractors
     extractors.clear()
-    
+
     # Load available docset configs using new system
-    from .config_loader import ConfigLoader
+    try:
+        from .config_loader import ConfigLoader
+    except ImportError:
+        from docsetmcp.config_loader import ConfigLoader
 
     loader = ConfigLoader()
     try:
-        all_configs = loader.load_all_configs()
+        # Pass additional docset paths for auto-detection
+        additional_paths = []
+        if docsetmcp_config.additional_docset_paths:
+            additional_paths = docsetmcp_config.parse_path_list(docsetmcp_config.additional_docset_paths)
+        
+        all_configs = loader.load_all_configs(additional_paths if additional_paths else None)
 
         # Try to initialize each docset
-        for docset_type, _ in all_configs.items():
+        for docset_type, config in all_configs.items():
             try:
-                extractors[docset_type] = DashExtractor(docset_type, docsetmcp_config.docset_path)
-            except FileNotFoundError:
+                # Create a modified DashExtractor that uses the provided config
+                extractor = DashExtractor.__new__(DashExtractor)
+                extractor.config = config
+                
+                # Build list of paths to search for docsets
+                search_paths: list[str] = []
+                
+                # Use custom docset location if provided, otherwise use configured paths
+                if docsetmcp_config.docset_path:
+                    search_paths.append(os.path.expanduser(docsetmcp_config.docset_path))
+                else:
+                    # Check environment variable for custom location
+                    env_path = os.getenv("DOCSET_PATH")
+                    if env_path:
+                        search_paths.append(os.path.expanduser(env_path))
+
+                    # Add additional paths from global config
+                    if docsetmcp_config.additional_docset_paths:
+                        additional_search_paths = docsetmcp_config.parse_path_list(
+                            docsetmcp_config.additional_docset_paths
+                        )
+                        search_paths.extend(additional_search_paths)
+
+                    # If no custom paths specified, use default Dash location
+                    if not search_paths:
+                        search_paths.append(
+                            os.path.expanduser("~/Library/Application Support/Dash/DocSets")
+                        )
+
+                # Find the docset in the search paths
+                extractor.docset = None
+                for search_path in search_paths:
+                    potential_docset = Path(search_path) / config["docset_path"]
+                    if potential_docset.exists():
+                        extractor.docset = potential_docset
+                        break
+
+                # If not found, skip this docset
+                if extractor.docset is None:
+                    continue
+                    
+                # Set up paths based on docset format
+                if config["format"] == "apple":
+                    extractor.fs_dir = extractor.docset / "Contents/Resources/Documents/fs"
+                    extractor.optimized_db = extractor.docset / "Contents/Resources/optimizedIndex.dsidx"
+                    extractor.cache_db = extractor.docset / "Contents/Resources/Documents/cache.db"
+                    # Cache for decompressed fs files
+                    extractor.fs_cache = {}
+                elif config["format"] == "tarix":
+                    extractor.optimized_db = extractor.docset / "Contents/Resources/optimizedIndex.dsidx"
+                    extractor.tarix_archive = extractor.docset / "Contents/Resources/tarix.tgz"
+                    extractor.tarix_index = extractor.docset / "Contents/Resources/tarixIndex.db"
+                    # Cache for extracted HTML content
+                    extractor.html_cache = {}
+
+                # Check if docset exists
+                if not extractor.docset.exists():
+                    continue
+
+                extractors[docset_type] = extractor
+                
+            except Exception as e:
+                # Debug: print what went wrong
+                print(f"Warning: Failed to initialize {docset_type}: {e}")
                 pass
 
     except Exception:
         # If config system fails, extractors will be empty
         # This is handled gracefully by the tool functions
         pass
+
 
 # Initialize extractors with default configuration on module load
 initialize_extractors()
@@ -2106,7 +2246,9 @@ def search_cheatsheet(
     # Try to get or create the cheatsheet extractor
     if cheatsheet not in cheatsheet_extractors:
         try:
-            cheatsheet_extractors[cheatsheet] = CheatsheetExtractor(cheatsheet, docsetmcp_config.cheatsheet_path)
+            cheatsheet_extractors[cheatsheet] = CheatsheetExtractor(
+                cheatsheet, docsetmcp_config.cheatsheet_path
+            )
         except FileNotFoundError:
             available = list_available_cheatsheets()
             return f"Error: Cheatsheet '{cheatsheet}' not found.\n\n{available}"
@@ -2172,7 +2314,9 @@ def list_cheatsheet_categories(cheatsheet: str) -> str:
     # Try to get or create the cheatsheet extractor
     if cheatsheet not in cheatsheet_extractors:
         try:
-            cheatsheet_extractors[cheatsheet] = CheatsheetExtractor(cheatsheet, docsetmcp_config.cheatsheet_path)
+            cheatsheet_extractors[cheatsheet] = CheatsheetExtractor(
+                cheatsheet, docsetmcp_config.cheatsheet_path
+            )
         except FileNotFoundError:
             return f"Error: Cheatsheet '{cheatsheet}' not found."
 
@@ -2210,7 +2354,9 @@ def fetch_cheatsheet(cheatsheet: str) -> str:
     # Try to get or create the cheatsheet extractor
     if cheatsheet not in cheatsheet_extractors:
         try:
-            cheatsheet_extractors[cheatsheet] = CheatsheetExtractor(cheatsheet, docsetmcp_config.cheatsheet_path)
+            cheatsheet_extractors[cheatsheet] = CheatsheetExtractor(
+                cheatsheet, docsetmcp_config.cheatsheet_path
+            )
         except FileNotFoundError:
             available = list_available_cheatsheets()
             return f"Error: Cheatsheet '{cheatsheet}' not found.\n\n{available}"
@@ -2222,7 +2368,11 @@ def main():
     """Main entry point for the MCP server"""
     import sys
     import argparse
-    from . import __version__
+
+    try:
+        from . import __version__
+    except ImportError:
+        from docsetmcp import __version__
 
     parser = argparse.ArgumentParser(
         prog="docsetmcp",
@@ -2258,6 +2408,18 @@ def main():
         help="Custom path to cheatsheets directory (overrides CHEATSHEET_PATH environment variable)",
     )
 
+    parser.add_argument(
+        "--additional-docset-paths",
+        nargs="*",
+        help="Additional docset paths to search in addition to default location",
+    )
+
+    parser.add_argument(
+        "--additional-cheatsheet-paths",
+        nargs="*",
+        help="Additional cheatsheet paths to search in addition to default location",
+    )
+
     # Parse args but allow for no args (normal MCP mode)
     args = parser.parse_args()
 
@@ -2266,9 +2428,17 @@ def main():
         docsetmcp_config.docset_path = args.docset_path
         # Re-initialize extractors with new path
         initialize_extractors()
-    
+
     if args.cheatsheet_path:
         docsetmcp_config.cheatsheet_path = args.cheatsheet_path
+
+    if args.additional_docset_paths:
+        docsetmcp_config.additional_docset_paths = args.additional_docset_paths
+        # Re-initialize extractors with new paths
+        initialize_extractors()
+
+    if args.additional_cheatsheet_paths:
+        docsetmcp_config.additional_cheatsheet_paths = args.additional_cheatsheet_paths
 
     # Handle special commands
     if args.list_docsets:

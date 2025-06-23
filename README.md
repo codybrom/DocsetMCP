@@ -162,13 +162,27 @@ docsetmcp --cheatsheet-path "/path/to/your/cheatsheets" --test-connection
 
 # Use both custom paths
 docsetmcp --docset-path "/custom/docsets" --cheatsheet-path "/custom/cheatsheets"
+
+# Use additional search paths (searches multiple locations)
+docsetmcp --additional-docset-paths "/extra/docsets" "/more/docsets"
+docsetmcp --additional-cheatsheet-paths "/extra/cheatsheets" "/more/cheatsheets"
 ```
 
 **Priority Order:**
 
 1. CLI arguments (highest priority)
-2. Environment variables
+2. Environment variables  
 3. Default Dash locations (lowest priority)
+
+**Additional Search Paths:**
+
+The `--additional-docset-paths` and `--additional-cheatsheet-paths` options allow DocsetMCP to search in multiple locations beyond the primary path. This is useful when:
+
+- You have docsets in multiple directories
+- You want to include third-party or custom docsets
+- You're sharing docsets across different tools
+
+DocsetMCP will automatically discover and configure docsets found in these additional paths.
 
 ### MCP Client Setup
 
